@@ -1,0 +1,4 @@
+../Core/Src/custom.c:46:6:customInit	8	static
+../Core/Src/custom.c:66:6:customLoop	8	static
+../Core/Src/custom.c:222:6:oledCheck	8	static
+../Core/Src/custom.c:238:6:HAL_GPIO_EXTI_Callback	16	static

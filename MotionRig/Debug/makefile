@@ -9,6 +9,10 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include USB_DEVICE/Target/subdir.mk
+-include USB_DEVICE/App/subdir.mk
+-include Middlewares/ST/STM32_USB_Device_Library/Core/Src/subdir.mk
+-include Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/subdir.mk
 -include Drivers/STM32H7xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
@@ -60,8 +64,8 @@ all: main-build
 main-build: MotionRig.elf secondary-outputs
 
 # Tool invocations
-MotionRig.elf MotionRig.map: $(OBJS) $(USER_OBJS) C:\Users\maf\Desktop\Projekt\MotorControl\MotionRig\STM32H750VBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "MotionRig.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\maf\Desktop\Projekt\MotorControl\MotionRig\STM32H750VBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MotionRig.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+MotionRig.elf MotionRig.map: $(OBJS) $(USER_OBJS) C:\Users\jakob\OneDrive\ -\ Aalborg\ Universitet\Skrivebord\Skole\10.\ Sem\Firmware\MotionRig\STM32H750VBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "MotionRig.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\jakob\OneDrive - Aalborg Universitet\Skrivebord\Skole\10. Sem\Firmware\MotionRig\STM32H750VBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="MotionRig.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

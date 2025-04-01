@@ -1044,10 +1044,10 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, S3_Direction_Pin|S1_Direction_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : CONFIG_S1_Pin CONFIG_S2_Pin CONFIG_S3_Pin CONFIG_S4_Pin
-                           CONFIG_S5_Pin */
-  GPIO_InitStruct.Pin = CONFIG_S1_Pin|CONFIG_S2_Pin|CONFIG_S3_Pin|CONFIG_S4_Pin
-                          |CONFIG_S5_Pin;
+  /*Configure GPIO pins : Config_1_Pin Config_2_Pin Config_3_Pin Config_4_Pin
+                           Config_5_Pin */
+  GPIO_InitStruct.Pin = Config_1_Pin|Config_2_Pin|Config_3_Pin|Config_4_Pin
+                          |Config_5_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
@@ -1079,9 +1079,9 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : BTN2_Pin BTN1_Pin S4_EncZ_Pin S4_Treach_Pin
+  /*Configure GPIO pins : BTN_A_Pin BTN_B_Pin S4_EncZ_Pin S4_Treach_Pin
                            S3_Ready_Pin */
-  GPIO_InitStruct.Pin = BTN2_Pin|BTN1_Pin|S4_EncZ_Pin|S4_Treach_Pin
+  GPIO_InitStruct.Pin = BTN_A_Pin|BTN_B_Pin|S4_EncZ_Pin|S4_Treach_Pin
                           |S3_Ready_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;

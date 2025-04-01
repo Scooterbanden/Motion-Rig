@@ -61,16 +61,16 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define CONFIG_S1_Pin GPIO_PIN_2
-#define CONFIG_S1_GPIO_Port GPIOE
-#define CONFIG_S2_Pin GPIO_PIN_3
-#define CONFIG_S2_GPIO_Port GPIOE
-#define CONFIG_S3_Pin GPIO_PIN_4
-#define CONFIG_S3_GPIO_Port GPIOE
-#define CONFIG_S4_Pin GPIO_PIN_5
-#define CONFIG_S4_GPIO_Port GPIOE
-#define CONFIG_S5_Pin GPIO_PIN_6
-#define CONFIG_S5_GPIO_Port GPIOE
+#define Config_1_Pin GPIO_PIN_2
+#define Config_1_GPIO_Port GPIOE
+#define Config_2_Pin GPIO_PIN_3
+#define Config_2_GPIO_Port GPIOE
+#define Config_3_Pin GPIO_PIN_4
+#define Config_3_GPIO_Port GPIOE
+#define Config_4_Pin GPIO_PIN_5
+#define Config_4_GPIO_Port GPIOE
+#define Config_5_Pin GPIO_PIN_6
+#define Config_5_GPIO_Port GPIOE
 #define UI_EncA_Pin GPIO_PIN_0
 #define UI_EncA_GPIO_Port GPIOA
 #define UI_EncB_Pin GPIO_PIN_1
@@ -91,10 +91,10 @@ void Error_Handler(void);
 #define LED4_GPIO_Port GPIOC
 #define LED5_Pin GPIO_PIN_0
 #define LED5_GPIO_Port GPIOB
-#define BTN2_Pin GPIO_PIN_1
-#define BTN2_GPIO_Port GPIOB
-#define BTN1_Pin GPIO_PIN_2
-#define BTN1_GPIO_Port GPIOB
+#define BTN_A_Pin GPIO_PIN_1
+#define BTN_A_GPIO_Port GPIOB
+#define BTN_B_Pin GPIO_PIN_2
+#define BTN_B_GPIO_Port GPIOB
 #define S4_Ready_Pin GPIO_PIN_7
 #define S4_Ready_GPIO_Port GPIOE
 #define S4_EncA_Pin GPIO_PIN_9
@@ -147,6 +147,10 @@ void Error_Handler(void);
 #define S2_Treach_GPIO_Port GPIOA
 #define S1_PulseHR_Pin GPIO_PIN_10
 #define S1_PulseHR_GPIO_Port GPIOA
+#define SWDIO_Pin GPIO_PIN_13
+#define SWDIO_GPIO_Port GPIOA
+#define SWCLK_Pin GPIO_PIN_14
+#define SWCLK_GPIO_Port GPIOA
 #define S2_EncA_Pin GPIO_PIN_15
 #define S2_EncA_GPIO_Port GPIOA
 #define S2_EncZ_Pin GPIO_PIN_12

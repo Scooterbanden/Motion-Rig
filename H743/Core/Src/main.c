@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "Custom.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -143,7 +143,7 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
-
+  userInit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -153,6 +153,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  userLoop();
   }
   /* USER CODE END 3 */
 }
@@ -1032,11 +1033,16 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOB, LED5_Pin|LogicShifter_OE_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, S4_Enable_Pin|S4_Direction_Pin|EEPROM_WP_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(S4_Enable_GPIO_Port, S4_Enable_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, S3_Enable_Pin|S3_Direction_Pin|S2_Enable_Pin|S1_Direction_Pin
-                          |S1_Enable_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, S4_Direction_Pin|EEPROM_WP_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, S3_Enable_Pin|S2_Enable_Pin|S1_Enable_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOD, S3_Direction_Pin|S1_Direction_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : CONFIG_S1_Pin CONFIG_S2_Pin CONFIG_S3_Pin CONFIG_S4_Pin
                            CONFIG_S5_Pin */

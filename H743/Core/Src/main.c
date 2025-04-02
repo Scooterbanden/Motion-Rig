@@ -22,7 +22,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "Custom.h"
+#include "custom.h"
+#include "servo.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -1027,22 +1028,23 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, LED1_Pin|LED2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, LED3_Pin|LED4_Pin|S2_Direction_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LED3_Pin|LED4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LED5_Pin|LogicShifter_OE_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(S4_Enable_GPIO_Port, S4_Enable_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOE, S4_Enable_Pin|S4_Direction_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, S4_Direction_Pin|EEPROM_WP_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, S3_Enable_Pin|S3_Direction_Pin|S2_Enable_Pin|S1_Direction_Pin
+                          |S1_Enable_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, S3_Enable_Pin|S2_Enable_Pin|S1_Enable_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(S2_Direction_GPIO_Port, S2_Direction_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, S3_Direction_Pin|S1_Direction_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(EEPROM_WP_GPIO_Port, EEPROM_WP_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pins : Config_1_Pin Config_2_Pin Config_3_Pin Config_4_Pin
                            Config_5_Pin */
@@ -1059,11 +1061,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : UI_Sw_Pin S2_Ready_Pin S2_Treach_Pin */
-  GPIO_InitStruct.Pin = UI_Sw_Pin|S2_Ready_Pin|S2_Treach_Pin;
+  /*Configure GPIO pin : UI_Sw_Pin */
+  GPIO_InitStruct.Pin = UI_Sw_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(UI_Sw_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LED3_Pin LED4_Pin S2_Direction_Pin */
   GPIO_InitStruct.Pin = LED3_Pin|LED4_Pin|S2_Direction_Pin;
@@ -1079,17 +1081,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : BTN_A_Pin BTN_B_Pin S4_EncZ_Pin S4_Treach_Pin
-                           S3_Ready_Pin */
-  GPIO_InitStruct.Pin = BTN_A_Pin|BTN_B_Pin|S4_EncZ_Pin|S4_Treach_Pin
-                          |S3_Ready_Pin;
+  /*Configure GPIO pins : BTN_A_Pin BTN_B_Pin S4_EncZ_Pin */
+  GPIO_InitStruct.Pin = BTN_A_Pin|BTN_B_Pin|S4_EncZ_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : S4_Ready_Pin */
   GPIO_InitStruct.Pin = S4_Ready_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(S4_Ready_GPIO_Port, &GPIO_InitStruct);
 
@@ -1100,6 +1100,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : S4_Treach_Pin S3_Ready_Pin */
+  GPIO_InitStruct.Pin = S4_Treach_Pin|S3_Ready_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
   /*Configure GPIO pins : S3_Enable_Pin S3_Direction_Pin S2_Enable_Pin S1_Direction_Pin
                            S1_Enable_Pin */
   GPIO_InitStruct.Pin = S3_Enable_Pin|S3_Direction_Pin|S2_Enable_Pin|S1_Direction_Pin
@@ -1109,19 +1115,51 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : S3_Treach_Pin S3_EncZ_Pin S1_EncZ_Pin S1_Treach_Pin
-                           S1_Ready_Pin */
-  GPIO_InitStruct.Pin = S3_Treach_Pin|S3_EncZ_Pin|S1_EncZ_Pin|S1_Treach_Pin
-                          |S1_Ready_Pin;
+  /*Configure GPIO pins : S3_Treach_Pin S1_Treach_Pin S1_Ready_Pin */
+  GPIO_InitStruct.Pin = S3_Treach_Pin|S1_Treach_Pin|S1_Ready_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : S3_EncZ_Pin S1_EncZ_Pin */
+  GPIO_InitStruct.Pin = S3_EncZ_Pin|S1_EncZ_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : S2_Ready_Pin S2_Treach_Pin */
+  GPIO_InitStruct.Pin = S2_Ready_Pin|S2_Treach_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : S2_EncZ_Pin */
   GPIO_InitStruct.Pin = S2_EncZ_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(S2_EncZ_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(S1_EncZ_EXTI_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(S1_EncZ_EXTI_IRQn);
+
+  HAL_NVIC_SetPriority(BTN_A_EXTI_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(BTN_A_EXTI_IRQn);
+
+  HAL_NVIC_SetPriority(BTN_B_EXTI_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(BTN_B_EXTI_IRQn);
+
+  HAL_NVIC_SetPriority(S1_Treach_EXTI_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(S1_Treach_EXTI_IRQn);
+
+  HAL_NVIC_SetPriority(S1_Ready_EXTI_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(S1_Ready_EXTI_IRQn);
+
+  HAL_NVIC_SetPriority(UI_Sw_EXTI_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(UI_Sw_EXTI_IRQn);
+
+  HAL_NVIC_SetPriority(S3_Treach_EXTI_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(S3_Treach_EXTI_IRQn);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 

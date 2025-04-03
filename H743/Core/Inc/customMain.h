@@ -5,10 +5,24 @@
  *      Author: jmk
  */
 
-#ifndef INC_CUSTOM_H_
-#define INC_CUSTOM_H_
+#ifndef INC_CUSTOMMAIN_H_
+#define INC_CUSTOMMAIN_H_
 
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
 #include "main.h"
+
+typedef struct {
+	GPIO_TypeDef* port;
+	uint16_t pin;
+} GPIO_t;
+
+#include "comms.h"
+#include "servos.h"
+#include "control.h"
+#include "debug.h"
+
 
 extern HRTIM_HandleTypeDef hhrtim;
 
@@ -34,4 +48,6 @@ void userInit(void);
 void userLoop(void);
 
 
-#endif /* INC_CUSTOM_H_ */
+
+
+#endif /* INC_CUSTOMMAIN_H_ */

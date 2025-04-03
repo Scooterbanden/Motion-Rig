@@ -5,15 +5,11 @@
  *      Author: jmk
  */
 
-#ifndef INC_SERVO_H_
-#define INC_SERVO_H_
+#ifndef INC_SERVOS_H_
+#define INC_SERVOS_H_
 
+#include <customMain.h>
 #include "stm32h7xx_hal.h"
-
-typedef struct {
-	GPIO_TypeDef* port;
-	uint16_t pin;
-} GPIO_t;
 
 // Forward declaration
 struct servo_t;
@@ -71,4 +67,4 @@ void UpdateStruct(servo_t* s);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 */
 
-#endif /* INC_SERVO_H_ */
+#endif /* INC_SERVOS_H_ */

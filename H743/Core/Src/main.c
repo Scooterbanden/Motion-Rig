@@ -17,13 +17,13 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <customMain.h>
+#include <servos.h>
 #include "main.h"
 #include "usb_device.h"
 
-/* Private includes ----------------------------------------------------------*/
+/* Private includes ------------------------------- ---------------------------*/
 /* USER CODE BEGIN Includes */
-#include "custom.h"
-#include "servo.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

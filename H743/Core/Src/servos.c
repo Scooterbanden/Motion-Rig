@@ -3,23 +3,34 @@
  *
  *  Created on: Apr 2, 2025
  *      Author: jmk
+ *
+ *      Code for servomotors.
+ *      This segment has been ostensibly well defined at the behest of our lord and saviour, ChatGPT.
+ *      To forego the unpleasantries of a laborious switch-case construct, a dynamic function handle array is summoned upon.
+ *      Here, each element poised to engage with the identifier of the disruptor.
+ *      This, in turn, instigates a precisely ordained function to act in accordance with the inscrutable will of the Creator.
+ *      There exists no permutation more optimal.
+ *      Peak efficiency has been achieved.
+ *      Do not entertain doubt.
+ *      It is good.
  */
 
-#include "servo.h"
-//#include "math.h"
+#include <customMain.h>
+#include <servos.h>
+#include "stdlib.h"
 
 void ReadyFunc(servo_t* s) {
-	s->readyFlag = !HAL_GPIO_ReadPin(s->readyPin.pin, s->readyPin.port);
+	s->readyFlag = !HAL_GPIO_ReadPin(s->readyPin.port, s->readyPin.pin);
 }
 
 void TreachFunc(servo_t* s) {
-	s->TreachFlag = !HAL_GPIO_ReadPin(s->TreachPin.pin, s->TreachPin.port);
+	s->TreachFlag = !HAL_GPIO_ReadPin(s->TreachPin.port, s->TreachPin.pin);
 }
 
 void EncZFunc(servo_t* s) {
 	uint32_t encoder_count = __HAL_TIM_GET_COUNTER(s->encoder);
 	uint32_t countDifference = encoder_count - s->lastZ;
-	if (abs(countDifference) < 5 | abs(abs(countDifference)- 10000) < 5) {
+	if ((abs(countDifference) < 5) | (abs(abs(countDifference)- 10000) < 5)) {
 		// Pretty much fine
 	} else {
 		// Encoder Error handling
@@ -28,10 +39,10 @@ void EncZFunc(servo_t* s) {
 
 // Struct instances for EXTI-related events
 servo_t extiStructs[] = {
-    {0, {GPIOD, S1_Ready_Pin}, 0, {GPIOD, S1_Treach_Pin}, 0, {GPIOD, S1_Enable_Pin}, 0, {GPIOD, S1_Direction_Pin}, 0, &htim8, TIM_CHANNEL_4, HRTIM_CHANNEL_C, &htim3, 0, 0},
-	{0, {GPIOA, S2_Ready_Pin}, 0, {GPIOA, S2_Treach_Pin}, 0, {GPIOD, S2_Enable_Pin}, 0, {GPIOC, S2_Direction_Pin}, 0, &htim12, TIM_CHANNEL_1, HRTIM_CHANNEL_B, &htim2, 0, 0},
-	{0, {GPIOB, S3_Ready_Pin}, 0, {GPIOD, S3_Treach_Pin}, 0, {GPIOD, S3_Enable_Pin}, 0, {GPIOD, S3_Direction_Pin}, 0, &htim14, TIM_CHANNEL_1, HRTIM_CHANNEL_A, &htim4, 0, 0},
-	{0, {GPIOE, S4_Ready_Pin}, 0, {GPIOB, S4_Treach_Pin}, 0, {GPIOE, S4_Enable_Pin}, 0, {GPIOE, S4_Direction_Pin}, 0, &htim13, TIM_CHANNEL_1, NULL, &htim1, 0, 0}
+    {0, {GPIOD, S1_Ready_Pin}, 0, {GPIOD, S1_Treach_Pin}, 0, {GPIOD, S1_Enable_Pin}, 0, {GPIOD, S1_Direction_Pin}, 0, &htim8, TIM_CHANNEL_4, HRTIM_TIMERINDEX_TIMER_C, &htim3, 0, 0},
+	{0, {GPIOA, S2_Ready_Pin}, 0, {GPIOA, S2_Treach_Pin}, 0, {GPIOD, S2_Enable_Pin}, 0, {GPIOC, S2_Direction_Pin}, 0, &htim12, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_B, &htim2, 0, 0},
+	{0, {GPIOB, S3_Ready_Pin}, 0, {GPIOD, S3_Treach_Pin}, 0, {GPIOD, S3_Enable_Pin}, 0, {GPIOD, S3_Direction_Pin}, 0, &htim14, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_A, &htim4, 0, 0},
+	{0, {GPIOE, S4_Ready_Pin}, 0, {GPIOB, S4_Treach_Pin}, 0, {GPIOE, S4_Enable_Pin}, 0, {GPIOE, S4_Direction_Pin}, 0, &htim13, TIM_CHANNEL_1, 0, &htim1, 0, 0}
 };
 
 // Individual handler functions that call the struct update function

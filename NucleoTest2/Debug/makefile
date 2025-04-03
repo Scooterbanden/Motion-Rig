@@ -61,8 +61,8 @@ all: main-build
 main-build: NucleoTest2.elf secondary-outputs
 
 # Tool invocations
-NucleoTest2.elf NucleoTest2.map: $(OBJS) $(USER_OBJS) C:\Users\jakob\STM32CubeIDE\workspace_1.16.0\NucleoTest2\STM32F746ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "NucleoTest2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\jakob\STM32CubeIDE\workspace_1.16.0\NucleoTest2\STM32F746ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="NucleoTest2.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+NucleoTest2.elf NucleoTest2.map: $(OBJS) $(USER_OBJS) C:\Users\jakob\OneDrive\ -\ Aalborg\ Universitet\Skrivebord\Skole\10.\ Sem\Firmware\NucleoTest2\STM32F746ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "NucleoTest2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"C:\Users\jakob\OneDrive - Aalborg Universitet\Skrivebord\Skole\10. Sem\Firmware\NucleoTest2\STM32F746ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="NucleoTest2.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

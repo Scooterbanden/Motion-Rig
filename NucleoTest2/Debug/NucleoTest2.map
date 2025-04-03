@@ -7005,34 +7005,34 @@ LOAD C:/ST/STM32CubeIDE_1.16.0/STM32CubeIDE/plugins/com.st.stm32cube.ide.mcu.ext
  .debug_line    0x000183d2     0x2ce5 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.o
  .debug_line    0x0001b0b7     0x1dbe ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_usb.o
 
-.debug_str      0x00000000    0xfc485
- .debug_str     0x00000000    0xfc485 ./Core/Src/custom.o
+.debug_str      0x00000000    0xfc4e7
+ .debug_str     0x00000000    0xfc4e7 ./Core/Src/custom.o
                               0xf2baf (size before relaxing)
- .debug_str     0x000fc485    0xf3f90 ./Core/Src/main.o
- .debug_str     0x000fc485    0xf0452 ./Core/Src/stm32f7xx_hal_msp.o
- .debug_str     0x000fc485    0xeecab ./Core/Src/stm32f7xx_it.o
- .debug_str     0x000fc485     0x99fe ./Core/Src/syscalls.o
- .debug_str     0x000fc485     0x779c ./Core/Src/sysmem.o
- .debug_str     0x000fc485    0xee2f5 ./Core/Src/system_stm32f7xx.o
- .debug_str     0x000fc485       0x9c ./Core/Startup/startup_stm32f746zgtx.o
- .debug_str     0x000fc485    0xf27c9 ./Drivers/Libraries/Src/invaders.o
- .debug_str     0x000fc485     0x796c ./Drivers/Libraries/Src/invaders_assets.o
- .debug_str     0x000fc485    0xf2d91 ./Drivers/Libraries/Src/ssd1306.o
- .debug_str     0x000fc485    0xeec5e ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.o
- .debug_str     0x000fc485    0xeec7b ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.o
- .debug_str     0x000fc485    0xefb16 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_eth.o
- .debug_str     0x000fc485    0xee3b3 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.o
- .debug_str     0x000fc485    0xef508 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c.o
- .debug_str     0x000fc485    0xee787 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c_ex.o
- .debug_str     0x000fc485    0xeed2e ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pcd.o
- .debug_str     0x000fc485    0xee630 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pcd_ex.o
- .debug_str     0x000fc485    0xee596 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr.o
- .debug_str     0x000fc485    0xee657 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.o
- .debug_str     0x000fc485    0xee58f ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.o
- .debug_str     0x000fc485    0xef618 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.o
- .debug_str     0x000fc485    0xeee5e ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.o
- .debug_str     0x000fc485    0xeefa4 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.o
- .debug_str     0x000fc485    0xeec0b ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_usb.o
+ .debug_str     0x000fc4e7    0xf3f90 ./Core/Src/main.o
+ .debug_str     0x000fc4e7    0xf0452 ./Core/Src/stm32f7xx_hal_msp.o
+ .debug_str     0x000fc4e7    0xeecab ./Core/Src/stm32f7xx_it.o
+ .debug_str     0x000fc4e7     0x99fe ./Core/Src/syscalls.o
+ .debug_str     0x000fc4e7     0x779c ./Core/Src/sysmem.o
+ .debug_str     0x000fc4e7    0xee2f5 ./Core/Src/system_stm32f7xx.o
+ .debug_str     0x000fc4e7       0x9c ./Core/Startup/startup_stm32f746zgtx.o
+ .debug_str     0x000fc4e7    0xf27ec ./Drivers/Libraries/Src/invaders.o
+ .debug_str     0x000fc4e7     0x796c ./Drivers/Libraries/Src/invaders_assets.o
+ .debug_str     0x000fc4e7    0xf2d91 ./Drivers/Libraries/Src/ssd1306.o
+ .debug_str     0x000fc4e7    0xeec5e ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.o
+ .debug_str     0x000fc4e7    0xeec7b ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.o
+ .debug_str     0x000fc4e7    0xefb16 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_eth.o
+ .debug_str     0x000fc4e7    0xee3b3 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.o
+ .debug_str     0x000fc4e7    0xef508 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c.o
+ .debug_str     0x000fc4e7    0xee787 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c_ex.o
+ .debug_str     0x000fc4e7    0xeed2e ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pcd.o
+ .debug_str     0x000fc4e7    0xee630 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pcd_ex.o
+ .debug_str     0x000fc4e7    0xee596 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr.o
+ .debug_str     0x000fc4e7    0xee657 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.o
+ .debug_str     0x000fc4e7    0xee58f ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.o
+ .debug_str     0x000fc4e7    0xef618 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.o
+ .debug_str     0x000fc4e7    0xeee5e ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.o
+ .debug_str     0x000fc4e7    0xeefa4 ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.o
+ .debug_str     0x000fc4e7    0xeec0b ./Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_usb.o
 
 .comment        0x00000000       0x43
  .comment       0x00000000       0x43 ./Core/Src/custom.o

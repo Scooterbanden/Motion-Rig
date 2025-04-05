@@ -8,10 +8,12 @@
 #ifndef INC_CONTROL_H_
 #define INC_CONTROL_H_
 
-#define CLOCKFREQ 240000000
-#define BASE 32768
-#define RPMLIMIT 3000
+#define CLOCKFREQ 1500000
+#define RPM2FREQ 25/3
 
-void setMotorSpeed(int16_t rpm);
+extern uint32_t pc;
+extern uint32_t startTime;
+
+void setMotorSpeed(int16_t rpm, servo_t servo);
 
 #endif /* INC_CONTROL_H_ */

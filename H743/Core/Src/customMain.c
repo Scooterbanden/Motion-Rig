@@ -13,11 +13,12 @@
 
 uint32_t timer;
 GPIO_t LEDs[5] = {{GPIOA, LED1_Pin},{GPIOA, LED2_Pin},{GPIOC, LED3_Pin},{GPIOC, LED4_Pin},{GPIOB, LED5_Pin}};
-
+uint8_t debugFlag = 0;
 uint8_t ledIdx = 0;
 
 void userInit(void) {
 	oledInit();
+	debugInit();
 	timer = HAL_GetTick();
 	//HAL_GPIO_WritePin(EN_PINS[3].port, EN_PINS[3].pin, GPIO_PIN_RESET);
 
@@ -34,13 +35,26 @@ void userInit(void) {
 }
 void userLoop(void) {
 	while (1) {
-		if (HAL_GetTick()-timer > 500) {
+		if (debugFlag & (HAL_GetTick()-startTime > 1000)) {
+			HAL_TIM_OC_Stop(servo[0].pulseTimerGP, servo[0].TIM_CH_GP);
+			//uint16_t count = __HAL_TIM_GET_COUNTER(&htim15);
+			//uint32_t final = (pc<<16) + (uint32_t)count;
+			ssd1306_Fill(Black);
+			ssd1306_SetCursor(2, 0);
+			oledPrintf("Counted: ");
+			ssd1306_SetCursor(2, 20);
+			oledPrintf("%d", pc);
+			ssd1306_UpdateScreen();
+			pc = 0;
+			debugFlag = 0;
+			/*
 			timer = HAL_GetTick();
 			HAL_GPIO_TogglePin(LEDs[ledIdx].port, LEDs[ledIdx].pin);
 			ledIdx++;
-			if (ledIdx >= 5) {
+			if (ledIdx >= 4) {
 				ledIdx = 0;
 			}
+			*/
 		}
 	}
 }

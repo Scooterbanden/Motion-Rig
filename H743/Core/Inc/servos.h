@@ -37,7 +37,7 @@ struct servo_t {
 typedef struct servo_t servo_t;
 
 // External reference to the struct array
-extern servo_t extiStructs[];
+extern servo_t servo[];
 
 // Function prototypes
 void UpdateReady(servo_t* s);

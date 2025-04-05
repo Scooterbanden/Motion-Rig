@@ -38,29 +38,29 @@ void EncZFunc(servo_t* s) {
 }
 
 // Struct instances for EXTI-related events
-servo_t extiStructs[] = {
+servo_t servo[] = {
     {0, {GPIOD, S1_Ready_Pin}, 0, {GPIOD, S1_Treach_Pin}, 0, {GPIOD, S1_Enable_Pin}, 0, {GPIOD, S1_Direction_Pin}, 0, &htim8, TIM_CHANNEL_4, HRTIM_TIMERINDEX_TIMER_C, &htim3, 0, 0},
-	{0, {GPIOA, S2_Ready_Pin}, 0, {GPIOA, S2_Treach_Pin}, 0, {GPIOD, S2_Enable_Pin}, 0, {GPIOC, S2_Direction_Pin}, 0, &htim12, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_B, &htim2, 0, 0},
+	//{0, {GPIOA, S2_Ready_Pin}, 0, {GPIOA, S2_Treach_Pin}, 0, {GPIOD, S2_Enable_Pin}, 0, {GPIOC, S2_Direction_Pin}, 0, &htim12, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_B, &htim2, 0, 0},
 	{0, {GPIOB, S3_Ready_Pin}, 0, {GPIOD, S3_Treach_Pin}, 0, {GPIOD, S3_Enable_Pin}, 0, {GPIOD, S3_Direction_Pin}, 0, &htim14, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_A, &htim4, 0, 0},
 	{0, {GPIOE, S4_Ready_Pin}, 0, {GPIOB, S4_Treach_Pin}, 0, {GPIOE, S4_Enable_Pin}, 0, {GPIOE, S4_Direction_Pin}, 0, &htim13, TIM_CHANNEL_1, 0, &htim1, 0, 0}
 };
 
 // Individual handler functions that call the struct update function
-void Handle_EXTI0(void)  { EncZFunc(&extiStructs[0]); }
-void Handle_EXTI1(void)  { /* Button A */}
-void Handle_EXTI2(void)  { /* Button B */}
-void Handle_EXTI3(void) { TreachFunc(&extiStructs[0]); }
-void Handle_EXTI4(void)  { ReadyFunc(&extiStructs[0]); }
-void Handle_EXTI5(void)  { /* Button Encoder */}
-void Handle_EXTI7(void)  { ReadyFunc(&extiStructs[3]); }
-void Handle_EXTI8(void) { ReadyFunc(&extiStructs[1]); }
-void Handle_EXTI9(void)  { TreachFunc(&extiStructs[1]); }
-void Handle_EXTI10(void)  { TreachFunc(&extiStructs[2]); }
-void Handle_EXTI11(void)  { EncZFunc(&extiStructs[3]); }
-void Handle_EXTI12(void) { EncZFunc(&extiStructs[1]); }
-void Handle_EXTI13(void)  { TreachFunc(&extiStructs[3]); }
-void Handle_EXTI14(void)  { EncZFunc(&extiStructs[2]); }
-void Handle_EXTI15(void) { ReadyFunc(&extiStructs[2]); }
+void Handle_EXTI0(void)  { EncZFunc(&servo[0]); }
+void Handle_EXTI1(void)  { btnCallbackA(); }
+void Handle_EXTI2(void)  { btnCallbackB(); }
+void Handle_EXTI3(void) { TreachFunc(&servo[0]); }
+void Handle_EXTI4(void)  { ReadyFunc(&servo[0]); }
+void Handle_EXTI5(void)  { btnCallbackEnc(); }
+void Handle_EXTI7(void)  { ReadyFunc(&servo[3]); }
+void Handle_EXTI8(void) { ReadyFunc(&servo[1]); }
+void Handle_EXTI9(void)  { TreachFunc(&servo[1]); }
+void Handle_EXTI10(void)  { TreachFunc(&servo[2]); }
+void Handle_EXTI11(void)  { EncZFunc(&servo[3]); }
+void Handle_EXTI12(void) { EncZFunc(&servo[1]); }
+void Handle_EXTI13(void)  { TreachFunc(&servo[3]); }
+void Handle_EXTI14(void)  { EncZFunc(&servo[2]); }
+void Handle_EXTI15(void) { ReadyFunc(&servo[2]); }
 
 // Lookup table indexed by pin number (NULL for unused pins)
 typedef void (*ExtiHandler)(void);

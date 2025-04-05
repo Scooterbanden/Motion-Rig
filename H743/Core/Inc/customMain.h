@@ -10,19 +10,23 @@
 
 #include "stdio.h"
 #include "stdlib.h"
+#include "stdarg.h"
 #include "string.h"
 #include "main.h"
+#include "EEPROM.h"
 
 typedef struct {
 	GPIO_TypeDef* port;
 	uint16_t pin;
 } GPIO_t;
 
+#include "debug.h"
 #include "comms.h"
 #include "servos.h"
 #include "control.h"
-#include "debug.h"
 
+extern uint8_t debugFlag;
+extern GPIO_t LEDs[5];
 
 extern HRTIM_HandleTypeDef hhrtim;
 
@@ -40,6 +44,7 @@ extern TIM_HandleTypeDef htim8;
 extern TIM_HandleTypeDef htim12;
 extern TIM_HandleTypeDef htim13;
 extern TIM_HandleTypeDef htim14;
+extern TIM_HandleTypeDef htim15;
 
 extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart3;

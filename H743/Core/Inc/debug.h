@@ -12,8 +12,15 @@
 #include "ssd1306_fonts.h"
 #include "ssd1306_tests.h"
 
+void debugInit(void);
+void btnCallbackA(void);
+void btnCallbackB(void);
+void btnCallbackEnc(void);
+
 void oledInit(void);
 uint8_t oledCheck(void);
+
+void oledPrintf(const char *fmt, ...);
 
 
 #endif /* INC_DEBUG_H_ */

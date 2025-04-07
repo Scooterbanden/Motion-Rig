@@ -8,7 +8,7 @@
 #ifndef INC_CONTROL_H_
 #define INC_CONTROL_H_
 
-#define CLOCKFREQ 1500000
+#define CLOCKFREQ 20000000
 #define RPM2FREQ 25/3
 
 extern uint32_t pc;

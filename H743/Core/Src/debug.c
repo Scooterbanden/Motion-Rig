@@ -36,9 +36,9 @@ void btnCallbackA(void) {
 		__HAL_TIM_SET_COMPARE(servo[0].pulseTimerGP, servo[0].TIM_CH_GP,ARR/2);
 		HAL_TIM_OC_Start(servo[0].pulseTimerGP, servo[0].TIM_CH_GP);
 		*/
+		//HAL_GPIO_WritePin(GPIOB, LogicShifter_OE_Pin, GPIO_PIN_SET);
 
-
-		HAL_GPIO_WritePin(servo[0].enablePin.port, servo[0].enablePin.pin, GPIO_PIN_RESET);
+		//HAL_GPIO_WritePin(servo[0].enablePin.port, servo[0].enablePin.pin, GPIO_PIN_RESET);
 		setMotorSpeed(180, servo[0]);
 		debugFlag = 1;
 

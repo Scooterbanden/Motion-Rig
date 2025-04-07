@@ -12,7 +12,6 @@
 
 
 uint32_t timer;
-GPIO_t LEDs[5] = {{GPIOA, LED1_Pin},{GPIOA, LED2_Pin},{GPIOC, LED3_Pin},{GPIOC, LED4_Pin},{GPIOB, LED5_Pin}};
 uint8_t debugFlag = 0;
 uint8_t ledIdx = 0;
 
@@ -35,15 +34,20 @@ void userInit(void) {
 }
 void userLoop(void) {
 	while (1) {
-		if (debugFlag & (HAL_GetTick()-startTime > 1000)) {
+		uint32_t elapsedTime = HAL_GetTick()-startTime;
+		if (debugFlag & (elapsedTime > 1000)) {
 			HAL_TIM_OC_Stop(servo[0].pulseTimerGP, servo[0].TIM_CH_GP);
 			//uint16_t count = __HAL_TIM_GET_COUNTER(&htim15);
 			//uint32_t final = (pc<<16) + (uint32_t)count;
+			uint32_t estPulses = elapsedTime*1500/1000;
 			ssd1306_Fill(Black);
 			ssd1306_SetCursor(2, 0);
-			oledPrintf("Counted: ");
+			oledPrintLinef("Counted: ");
 			ssd1306_SetCursor(2, 20);
-			oledPrintf("%d", pc);
+			oledPrintLinef("%d", pc);
+			ssd1306_SetCursor(2, 40);
+			oledPrintLinef("Est: %d", estPulses);
+
 			ssd1306_UpdateScreen();
 			pc = 0;
 			debugFlag = 0;

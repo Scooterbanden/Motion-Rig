@@ -22,6 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <customMain.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -724,7 +725,7 @@ static void MX_TIM8_Init(void)
 
   /* USER CODE END TIM8_Init 1 */
   htim8.Instance = TIM8;
-  htim8.Init.Prescaler = 79;
+  htim8.Init.Prescaler = 5;
   htim8.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim8.Init.Period = 65535;
   htim8.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -1157,7 +1158,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin : S4_Ready_Pin */
   GPIO_InitStruct.Pin = S4_Ready_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(S4_Ready_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : S4_Enable_Pin S4_Direction_Pin EEPROM_WP_Pin */

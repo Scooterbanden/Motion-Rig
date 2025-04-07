@@ -9,7 +9,7 @@
  */
 
 #include <customMain.h>
-#include "debug.h"
+#include <interface.h>
 
 #define DELAY 200			// Button delay for debouncing ([ms])
 //#define BASE 2147483648		// Encoder initial value (middle of starts in middle and above/below middle is positive/negative speed
@@ -21,7 +21,7 @@ uint32_t btnEncTimer;
 
 GPIO_t LEDs[5] = {{GPIOA, LED1_Pin},{GPIOA, LED2_Pin},{GPIOC, LED3_Pin},{GPIOC, LED4_Pin},{GPIOB, LED5_Pin}};
 
-void debugInit(void) {
+void interfaceInit(void) {
 	uint32_t initTime = HAL_GetTick();
 	btnATimer = initTime;
 	btnBTimer = initTime;
@@ -95,6 +95,7 @@ void oledInit(void) {
 	//ssd1306_Line(0,0,128,64,White);
 	//ssd1306_DrawBitmap(0,0,stars_128x64,128,64,Black);
 
+	/*
 	ssd1306_Fill(White);
 	ssd1306_DrawBitmap(0,0,mig_128x64,128,64,Black);
 	ssd1306_UpdateScreen();
@@ -103,14 +104,16 @@ void oledInit(void) {
 	ssd1306_DrawBitmap(0,0,MAF_128x64,128,64,Black);
 	ssd1306_UpdateScreen();
 	HAL_Delay(1500);
+	*/
+
 	ssd1306_Fill(White);
 	ssd1306_DrawBitmap(0,0,CoopF_128x64,128,64,Black);
 	ssd1306_UpdateScreen();
-	HAL_Delay(500);
+	HAL_Delay(200);
 	ssd1306_Fill(White);
 	ssd1306_DrawBitmap(0,0,CoopR_128x64,128,64,Black);
 	ssd1306_UpdateScreen();
-	HAL_Delay(500);
+	HAL_Delay(200);
 	ssd1306_Fill(White);
 	ssd1306_DrawBitmap(0,0,CoopC_128x64,128,64,Black);
 	ssd1306_UpdateScreen();
@@ -128,28 +131,27 @@ uint8_t oledCheck(void) {		// To check if an oled is present
 }
 
 // Public-facing function
-void oledPrintLinef(const char *fmt, ...) {
+void oledPrintLinef(SSD1306_Font_t font, SSD1306_COLOR color, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    oledPrintLinev(fmt, args);
+    oledPrintLinev(font, color, fmt, args);
     va_end(args);
 }
 
 // Clears display, writes formatted line at top and updates
-void oledPrintf(const char *fmt, ...) {
+void oledPrintf(SSD1306_Font_t font, SSD1306_COLOR color, const char *fmt, ...) {
     ssd1306_Fill(Black);
     ssd1306_SetCursor(2, 0);
-
     va_list args;
     va_start(args, fmt);
-    oledPrintLinev(fmt, args); // ✅ Now you can call it properly
+    oledPrintLinev(font, color, fmt, args); // ✅ Now you can call it properly
     va_end(args);
 
     ssd1306_UpdateScreen();
 }
 
 // New helper that takes a va_list
-void oledPrintLinev(const char *fmt, va_list args) {
+void oledPrintLinev(SSD1306_Font_t font, SSD1306_COLOR color, const char *fmt, va_list args) {
     // Determine the length needed for the formatted string
     va_list args_copy;
     va_copy(args_copy, args); // Copy because vsnprintf consumes it
@@ -162,7 +164,7 @@ void oledPrintLinev(const char *fmt, va_list args) {
     if (!buffer) return;
 
     vsnprintf(buffer, len + 1, fmt, args);
-    ssd1306_WriteString(buffer, Font_11x18, White);
+    ssd1306_WriteString(buffer, font, color);
     free(buffer);
 }
 

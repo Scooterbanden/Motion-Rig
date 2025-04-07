@@ -1114,10 +1114,10 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(EEPROM_WP_GPIO_Port, EEPROM_WP_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : Config_1_Pin Config_2_Pin Config_3_Pin Config_4_Pin
-                           Config_5_Pin */
-  GPIO_InitStruct.Pin = Config_1_Pin|Config_2_Pin|Config_3_Pin|Config_4_Pin
-                          |Config_5_Pin;
+  /*Configure GPIO pins : Config_0_Pin Config_1_Pin Config_2_Pin Config_3_Pin
+                           Config_4_Pin */
+  GPIO_InitStruct.Pin = Config_0_Pin|Config_1_Pin|Config_2_Pin|Config_3_Pin
+                          |Config_4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);

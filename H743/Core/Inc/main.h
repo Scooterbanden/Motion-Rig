@@ -61,16 +61,16 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define Config_1_Pin GPIO_PIN_2
+#define Config_0_Pin GPIO_PIN_2
+#define Config_0_GPIO_Port GPIOE
+#define Config_1_Pin GPIO_PIN_3
 #define Config_1_GPIO_Port GPIOE
-#define Config_2_Pin GPIO_PIN_3
+#define Config_2_Pin GPIO_PIN_4
 #define Config_2_GPIO_Port GPIOE
-#define Config_3_Pin GPIO_PIN_4
+#define Config_3_Pin GPIO_PIN_5
 #define Config_3_GPIO_Port GPIOE
-#define Config_4_Pin GPIO_PIN_5
+#define Config_4_Pin GPIO_PIN_6
 #define Config_4_GPIO_Port GPIOE
-#define Config_5_Pin GPIO_PIN_6
-#define Config_5_GPIO_Port GPIOE
 #define UI_EncA_Pin GPIO_PIN_0
 #define UI_EncA_GPIO_Port GPIOA
 #define UI_EncB_Pin GPIO_PIN_1

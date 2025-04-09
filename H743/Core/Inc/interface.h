@@ -12,7 +12,9 @@
 #include "ssd1306_fonts.h"
 #include "ssd1306_tests.h"
 
+extern int32_t encoderValue;
 extern GPIO_t LEDs[5];
+
 
 void interfaceInit(void);
 void btnCallbackA(void);

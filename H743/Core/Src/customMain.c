@@ -10,13 +10,11 @@
 //#include "main.h"
 #include <customMain.h>
 
-#define millisecondsPerFrame 400
-
+uint32_t millisecondsPerFrame = 400;
 uint32_t timer;
 
 uint8_t debugFlag = 0;
 uint8_t ledIdx = 0;
-system_state sysState = INITIAL_STATE;
 
 GPIO_t configs[5] = {{GPIOE, Config_0_Pin},{GPIOE, Config_1_Pin},{GPIOE, Config_2_Pin},{GPIOE, Config_3_Pin},{GPIOE, Config_4_Pin}};
 
@@ -41,31 +39,93 @@ void userInit(void) {
 
 void userLoop(void) {														// Lowest priority code, handles updating oled display (user inputs are interrupt based)
 	// Some commonly used helper variables
-	system_state prevState = INITIAL_STATE;
-	int32_t encoderValue = __HAL_TIM_GET_COUNTER(&htim5);
-	uint8_t toggle = 0;
-	int8_t select = 0;
 	SSD1306_COLOR optionColor[5];
+	uint8_t colorToggle = 1;
+	const SSD1306_Font_t *fontSelect;
+	uint8_t fontHeight;
 	while (1) {
-		if (sysState != prevState) {
-			prevState = sysState;
-			toggle = 0;
-			select = 0;
-		}
-		//uint32_t elapsedTime = HAL_GetTick()-startTime;
 		if ((HAL_GetTick()-timer) > millisecondsPerFrame) {
 			timer = HAL_GetTick();
+			ssd1306_Fill(Black);
 			int32_t newEncoderValue = __HAL_TIM_GET_COUNTER(&htim5);
 			int32_t difference = newEncoderValue - encoderValue;
-			if (difference != 0) { toggle = 1; }
 			encoderValue = newEncoderValue;
+			switch (menuState.current_menu->type) {
+			case Node:
+				// Changes selected option if encoder value changed
+				if (difference != 0) { colorToggle = 1; }
+				if (difference > 0) {
+					if (menuState.selected_index < (menuState.current_menu->num_items - 1)) {
+						menuState.selected_index += 1;
+					}
+				}
+				else if (difference < 0) {
+					if (menuState.selected_index > 0) {
+						menuState.selected_index -= 1;
+					}
+				}
 
-			ssd1306_Fill(Black);
-			ssd1306_SetCursor(2, 0);
-			for (int i = 0; i < 5; i++) {
-				optionColor[i] = White;
+				// Set font size based on menu options
+				if (menuState.current_menu->num_items < 4) {
+					fontSelect = &Font_11x18;
+					fontHeight = 20;
+				} else if (menuState.current_menu->num_items < 6) {
+					fontSelect = &Font_7x10;
+					fontHeight = 12;
+				} else {
+					fontSelect = &Font_6x8;
+					fontHeight = 10;
+				}
+
+				// Reset colors and toggle color of selected option
+				for (int i = 0; i < 5; i++) {
+					optionColor[i] = White;
+				}
+				if (colorToggle) {
+					optionColor[menuState.selected_index] = Black;
+					colorToggle = 0;
+				} else {colorToggle = 1;}
+
+				// Prints options
+				for (int i=0; i < menuState.current_menu->num_items; i++) {
+					ssd1306_SetCursor(2, i*fontHeight);
+					oledPrintLinef(*fontSelect, optionColor[i], menuState.current_menu->items[i].label);
+				}
+				break;
+
+			case Action:
+				/*
+				 * Action menu (like speed control) Prints label of (only) item as well as the encodervalue*(Enc->Rpm gain)
+				 * Currently there is control types:
+				 * Step, where the item has an action (sets rpm)
+				 * Speed, pulses are set each frame for enabled servos (no action on item)
+				*/
+				ssd1306_SetCursor(2, 0);
+				oledPrintLinef(Font_11x18, White, menuState.current_menu->items[0].label);
+				ssd1306_SetCursor(2, 20);
+				oledPrintLinef(Font_11x18, White, "%d", encoderValue*ENCRPMGAIN);
+				if (menuState.current_menu->items[0].action == NULL) {
+					for (int i = 0; i < 4; i++) {
+						if (servo[i].enableFlag) {
+							setMotorSpeed(encoderValue*ENCRPMGAIN, servo[0]);
+						}
+					}
+				}
+
 			}
+			if (menuState.current_menu->type == Action) {
 
+			} else if (menuState.current_menu->type == Node) {
+
+
+			}
+			if (menuState.current_menu->parent != NULL) {
+				ssd1306_DrawBitmap(110,2,Return_16x8,16,8,White);
+			}
+			ssd1306_DrawBitmap(116,54,Help_16x8,16,8,White);
+			ssd1306_UpdateScreen();
+
+			/*
 			switch (sysState) {
 			case INITIAL_STATE:				// Main menu 3 options: CONTROL_MODE, DEBUG_MODE,      Ė̷͓̝R̶͙̱̈́̇̾͜R̸̤̝̎Ō̶̳̱R̴̖̩͙̎̎͛͜_̴̳̼̰̔͘U̶̻̅N̴̠͉̱͆͂͝Ȁ̷͔̅̇U̸̢̹̓͝T̷̪̮͑H̶͇̯͐͊̚O̶̳̠͝R̵̙̋Ĭ̵̞̘͊̏Z̶͉̼͇͛E̶͖̥͕̍͋D̸̰̄_̸̙̓A̵̦̹̎C̶͇͐̓͂C̴͍͐E̷̗̱̋̚͝S̷̜̯̋̎̎S
 				select += difference;
@@ -82,10 +142,18 @@ void userLoop(void) {														// Lowest priority code, handles updating ole
 				oledPrintLinef(Font_11x18, optionColor[1], "Debug");
 				ssd1306_SetCursor(2, 40);
 				oledPrintLinef(Font_11x18, optionColor[2], "Other");
+				//ssd1306_DrawBitmap(110,2,Return_16x8,16,8,White);
+				ssd1306_DrawBitmap(116,54,Help_16x8,16,8,White);
 				ssd1306_UpdateScreen();
 
 				break;
+			case INITIAL_HELP:
+
+				break;
 			case CONTROL_MODE:
+
+				break;
+			case CONTROL_HELP:
 
 				break;
 			case DEBUG_MODE:
@@ -97,7 +165,7 @@ void userLoop(void) {														// Lowest priority code, handles updating ole
 
 				break;
 			}
-			/*
+
 			// HAL_TIM_OC_Stop(servo[0].pulseTimerGP, servo[0].TIM_CH_GP);
 			// uint16_t count = __HAL_TIM_GET_COUNTER(&htim15);
 			// uint32_t final = (pc<<16) + (uint32_t)count;

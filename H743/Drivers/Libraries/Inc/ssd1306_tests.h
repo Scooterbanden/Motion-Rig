@@ -5,6 +5,8 @@
 
 _BEGIN_STD_C
 
+extern const unsigned char Help_16x8[];
+extern const unsigned char Return_16x8[];
 extern const unsigned char gear_128x64[];
 extern const unsigned char garfield_128x64[];
 extern const unsigned char stars_128x64[];

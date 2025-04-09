@@ -15,11 +15,14 @@
 #include "main.h"
 #include "EEPROM.h"
 
+#define ENCRPMGAIN 10
+
 typedef struct {
 	GPIO_TypeDef* port;
 	uint16_t pin;
 } GPIO_t;
 
+#include "menus.h"
 #include <interface.h>
 #include "comms.h"
 #include "servos.h"
@@ -31,10 +34,14 @@ extern GPIO_t LEDs[5];
 typedef enum
 {
   INITIAL_STATE = 0U,
+  INITIAL_HELP,
   CONTROL_MODE,
+  CONTROL_HELP,
   DEBUG_MODE,
   Ė̷͓̝R̶͙̱̈́̇̾͜R̸̤̝̎Ō̶̳̱R̴̖̩͙̎̎͛͜_̴̳̼̰̔͘U̶̻̅N̴̠͉̱͆͂͝Ȁ̷͔̅̇U̸̢̹̓͝T̷̪̮͑H̶͇̯͐͊̚O̶̳̠͝R̵̙̋Ĭ̵̞̘͊̏Z̶͉̼͇͛E̶͖̥͕̍͋D̸̰̄_̸̙̓A̵̦̹̎C̶͇͐̓͂C̴͍͐E̷̗̱̋̚͝S̷̜̯̋̎̎S
 } system_state;
+
+
 
 extern HRTIM_HandleTypeDef hhrtim;
 

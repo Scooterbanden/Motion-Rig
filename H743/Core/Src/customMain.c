@@ -17,6 +17,7 @@ uint8_t debugFlag = 0;
 uint8_t ledIdx = 0;
 
 GPIO_t configs[5] = {{GPIOE, Config_0_Pin},{GPIOE, Config_1_Pin},{GPIOE, Config_2_Pin},{GPIOE, Config_3_Pin},{GPIOE, Config_4_Pin}};
+GPIO_t OE_pin = {GPIOB,LogicShifter_OE_Pin};
 
 void userInit(void) {
 	oledInit();
@@ -43,6 +44,7 @@ void userLoop(void) {														// Lowest priority code, handles updating ole
 	uint8_t colorToggle = 1;
 	const SSD1306_Font_t *fontSelect;
 	uint8_t fontHeight;
+	setGPIO(OE_pin,GPIO_PIN_SET);
 	while (1) {
 		if ((HAL_GetTick()-timer) > millisecondsPerFrame) {
 			timer = HAL_GetTick();

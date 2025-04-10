@@ -101,6 +101,7 @@ void btnCallbackEnc(void) {
 					menuState.current_menu = menuState.current_menu->items[menuState.selected_index].submenu;
 					menuState.selected_index = 0;
 					encoderValue = 0;
+					__HAL_TIM_SET_COUNTER(&htim5, 0);
 					if (menuState.current_menu->type == Action) {
 						for (int i = 0; i < 4; i++) {
 							if (getGPIO(servo[i].readyPin) == GPIO_PIN_RESET) {

@@ -100,7 +100,7 @@ Menu MainMenu = {
 	NULL,
 	&MainHelp
 };
-
+/*
 MainHelpItems[] = {
 
 };
@@ -111,7 +111,7 @@ Menu MainHelp = {
 	&MainMenu,
 	NULL
 };
-
+*/
 MenuState menuState = {
 	&MainMenu,
 	0

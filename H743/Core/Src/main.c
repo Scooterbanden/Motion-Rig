@@ -777,8 +777,7 @@ static void MX_TIM8_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM8_Init 2 */
-  HAL_TIM_OC_Start_IT(&htim8, TIM_CHANNEL_4);
-  HAL_NVIC_EnableIRQ(TIM8_CC_IRQn);
+
   /* USER CODE END TIM8_Init 2 */
   HAL_TIM_MspPostInit(&htim8);
 
@@ -967,11 +966,7 @@ static void MX_TIM15_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM15_Init 2 */
-  if (HAL_TIM_Base_Start_IT(&htim3) != HAL_OK)
-  {
-    /* Starting Error */
-    Error_Handler();
-  }
+
   /* USER CODE END TIM15_Init 2 */
 
 }

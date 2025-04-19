@@ -5,6 +5,18 @@
 
 _BEGIN_STD_C
 
+extern const unsigned char Help_16x8[];
+extern const unsigned char Return_16x8[];
+extern const unsigned char gear_128x64[];
+extern const unsigned char garfield_128x64[];
+extern const unsigned char stars_128x64[];
+extern const unsigned char mig_128x64[];
+extern const unsigned char pip_128x64[];
+extern const unsigned char CoopC_128x64[];
+extern const unsigned char CoopF_128x64[];
+extern const unsigned char CoopR_128x64[];
+extern const unsigned char MAF_128x64[];
+
 void ssd1306_TestBorder(void);
 void ssd1306_TestFonts1(void);
 void ssd1306_TestFonts2(void);

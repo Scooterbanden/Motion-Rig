@@ -5,6 +5,7 @@
  *      Author: jakob
  */
 
+/*
 #define test
 
 #include "main.h"
@@ -57,7 +58,7 @@ void customInit(void) {
 #ifdef test
 	  if (HAL_TIM_Base_Start_IT(&htim2) != HAL_OK)
 	  {
-	    /* Starting Error */
+
 	    Error_Handler();
 	  }
 #endif
@@ -70,7 +71,7 @@ void customLoop(void) {
 		HAL_GPIO_TogglePin(GPIOB,LD1_Pin);
 		HAL_Delay(500);
 #else
-	/*
+
 	if (tempData[0] == '\n') {
 		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_2);
 		// Full message received from interface, call to interpret
@@ -80,10 +81,10 @@ void customLoop(void) {
 
 		tempData[0] = 'c';		// Change tempData from \n
 		bufIdx = 0;
-	}*/
+	}
 
 	if (HAL_GetTick()-timer > 500) {
-		/*
+
 		switch (ledSelect) {
 		case 0:
 			HAL_GPIO_TogglePin(GPIOB,LD1_Pin);
@@ -98,7 +99,7 @@ void customLoop(void) {
 			ledSelect = 0;
 			break;
 		}
-		*/
+
 		int32_t encoder_count = __HAL_TIM_GET_COUNTER(&htim4);
 		int32_t motorEncoder_count = __HAL_TIM_GET_COUNTER(&htim1);
 		if (oledStatus) {
@@ -169,7 +170,7 @@ void customLoop(void) {
 #endif
 	}
 }
-
+*/
 /*
 void setMotorSpeed(int16_t rpm) {
 	int32_t ARR;
@@ -218,7 +219,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		HAL_UART_Receive_IT(&huart2, tempData, 1);
 	}
 }*/
-
+/*
 void oledCheck(void) {		// To check if an oled is present
 	if (HAL_I2C_IsDeviceReady(&hi2c2, SSD1306_I2C_ADDR, 1, 10) == HAL_OK) {
 		if (!oledStatus) {	// Initializes if oled has been offline
@@ -233,8 +234,9 @@ void oledCheck(void) {		// To check if an oled is present
 	} else {
 		oledStatus = 0;
 	}
-}
+}*/
 
+/*
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
     if (GPIO_Pin == GPIO_PIN_3) // Check if it's the button
@@ -252,4 +254,4 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     	}
     }
 }
-
+*/

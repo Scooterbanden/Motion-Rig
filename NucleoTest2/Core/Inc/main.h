@@ -49,6 +49,8 @@ extern "C" {
 
 /* USER CODE END EM */
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
@@ -60,6 +62,8 @@ void Error_Handler(void);
 #define USER_Btn_Pin GPIO_PIN_13
 #define USER_Btn_GPIO_Port GPIOC
 #define USER_Btn_EXTI_IRQn EXTI15_10_IRQn
+#define S1_Pulse_Pin GPIO_PIN_9
+#define S1_Pulse_GPIO_Port GPIOF
 #define MCO_Pin GPIO_PIN_0
 #define MCO_GPIO_Port GPIOH
 #define RMII_MDC_Pin GPIO_PIN_1
@@ -79,6 +83,10 @@ void Error_Handler(void);
 #define RMII_RXD1_GPIO_Port GPIOC
 #define LD1_Pin GPIO_PIN_0
 #define LD1_GPIO_Port GPIOB
+#define S1_Enable_Pin GPIO_PIN_0
+#define S1_Enable_GPIO_Port GPIOG
+#define S1_Direction_Pin GPIO_PIN_1
+#define S1_Direction_GPIO_Port GPIOG
 #define RMII_TXD1_Pin GPIO_PIN_13
 #define RMII_TXD1_GPIO_Port GPIOB
 #define LD3_Pin GPIO_PIN_14
@@ -109,6 +117,12 @@ void Error_Handler(void);
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
+#define S1_Ready_Pin GPIO_PIN_0
+#define S1_Ready_GPIO_Port GPIOD
+#define S1_Ready_EXTI_IRQn EXTI0_IRQn
+#define S1_Treach_Pin GPIO_PIN_1
+#define S1_Treach_GPIO_Port GPIOD
+#define S1_Treach_EXTI_IRQn EXTI1_IRQn
 #define RMII_TX_EN_Pin GPIO_PIN_11
 #define RMII_TX_EN_GPIO_Port GPIOG
 #define RMII_TXD0_Pin GPIO_PIN_13

@@ -106,6 +106,7 @@ void userLoop(void) {														// Lowest priority code, handles updating ole
 				oledPrintLinef(Font_11x18, White, menuState.current_menu->items[0].label);
 				ssd1306_SetCursor(2, 20);
 				oledPrintLinef(Font_11x18, White, "%d", encoderValue*ENCRPMGAIN);
+
 				if (menuState.current_menu->items[0].action == NULL) {
 					for (int i = 0; i < 4; i++) {
 						if (servo[i].enableFlag) {

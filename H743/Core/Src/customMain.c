@@ -40,6 +40,7 @@ void userInit(void) {
 
 void userLoop(void) {														// Lowest priority code, handles updating oled display (user inputs are interrupt based)
 	// Some commonly used helper variables
+	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
 	SSD1306_COLOR optionColor[5];
 	uint8_t colorToggle = 1;
 	const SSD1306_Font_t *fontSelect;
@@ -106,6 +107,9 @@ void userLoop(void) {														// Lowest priority code, handles updating ole
 				oledPrintLinef(Font_11x18, White, menuState.current_menu->items[0].label);
 				ssd1306_SetCursor(2, 20);
 				oledPrintLinef(Font_11x18, White, "%d", encoderValue*ENCRPMGAIN);
+				uint32_t servoEnc = __HAL_TIM_GET_COUNTER(&htim2);
+				ssd1306_SetCursor(2, 40);
+				oledPrintLinef(Font_11x18, White, "%d", servoEnc);
 				if (menuState.current_menu->items[0].action == NULL) {
 					for (int i = 0; i < 4; i++) {
 						if (servo[i].enableFlag) {

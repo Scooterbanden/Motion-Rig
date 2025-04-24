@@ -75,6 +75,11 @@ void btnCallbackB(void) {
 		#else
 			if (menuState.current_menu->type == Action) {
 				// Slowdown before disabling servo
+				for (int i = 0; i < 4; i++) {
+					setGPIO(servo[i].enablePin, GPIO_PIN_SET);
+					servo[i].enableFlag = 0;
+
+				}
 			}
 			if (menuState.current_menu->parent != NULL) {
 				menuState.current_menu = menuState.current_menu->parent;

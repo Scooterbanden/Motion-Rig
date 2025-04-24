@@ -1,5 +1,5 @@
 ../Core/Src/customMain.c:22:6:userInit	8	static
 ../Core/Src/customMain.c:41:6:userLoop	128	static
-../Core/Src/customMain.c:198:9:getConfig	16	static
-../Core/Src/customMain.c:203:6:setGPIO	24	static
-../Core/Src/customMain.c:207:15:getGPIO	16	static
+../Core/Src/customMain.c:201:9:getConfig	16	static
+../Core/Src/customMain.c:206:6:setGPIO	24	static
+../Core/Src/customMain.c:210:15:getGPIO	16	static

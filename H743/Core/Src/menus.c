@@ -33,7 +33,7 @@ Menu StepMenu = {
 		StepMenuItems,
 		sizeof(StepMenuItems) / sizeof(StepMenuItems[0]),
 		Action,
-		&ControlMenu,
+		&ManualMenu,
 		&StepHelp
 };
 
@@ -45,7 +45,7 @@ Menu SpeedMenu = {
 		SpeedMenuItems,
 		sizeof(SpeedMenuItems) / sizeof(SpeedMenuItems[0]),
 		Action,
-		&ControlMenu,
+		&ManualMenu,
 		&SpeedHelp
 };
 
@@ -58,7 +58,7 @@ Menu ManualMenu = {
 	ManualMenuItems,
 	sizeof(ManualMenuItems) / sizeof(ManualMenuItems[0]),
 	Node,
-	&ControlMenu,
+	&MainMenu,
 	&ManualHelp
 };
 
@@ -66,31 +66,18 @@ Menu ManualMenu = {
 MenuItem AutomaticMenuItems[] = {
 	{"Speed", NULL, NULL}
 };
-Menu AutomaticMenuMenu = {
+Menu AutomaticMenu = {
 	AutomaticMenuItems,
 	sizeof(AutomaticMenuItems) / sizeof(AutomaticMenuItems[0]),
 	Unused,
-	&ControlMenu,
+	&MainMenu,
 	&AutomaticHelp
 };
 
 
-MenuItem ControlMenuItems[] = {
-	{"Manual", NULL, &ManualMenu},
-	{"Automatic", NULL, &StepMenu}
-};
-Menu ControlMenu = {
-	ControlMenuItems,
-	sizeof(ControlMenuItems) / sizeof(ControlMenuItems[0]),
-	Node,
-	&MainMenu,
-	&ControlHelp
-};
-
-
 MenuItem MainMenuItems[] = {
-	{"Control", NULL, &ControlMenu},
-	{"Debug", NULL, NULL},
+	{"Manual", NULL, &ManualMenu},
+	{"Automatic", NULL, &AutomaticMenu},
 	{"Other", NULL, NULL}
 };
 Menu MainMenu = {
@@ -122,7 +109,7 @@ void setRPM(void) {
 	int32_t rpm = __HAL_TIM_GET_COUNTER(&htim5);
 	for (int i = 0; i < 4; i++) {
 		if (servo[i].enableFlag) {
-			setMotorSpeed(rpm*ENCRPMGAIN, servo[0]);
+			setMotorSpeed(rpm*ENCRPMGAIN, servo[i]);
 		}
 	}
 }

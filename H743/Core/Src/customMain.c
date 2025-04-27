@@ -22,7 +22,6 @@ GPIO_t OE_pin = {GPIOB,LogicShifter_OE_Pin};
 void userInit(void) {
 	oledInit();
 	interfaceInit();
-
 	timer = HAL_GetTick();
 
 	//HAL_GPIO_WritePin(EN_PINS[3].port, EN_PINS[3].pin, GPIO_PIN_RESET);
@@ -38,14 +37,25 @@ void userInit(void) {
 	//btnTimer = HAL_GetTick();
 }
 
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {		// Main screen generate frame
+    if (htim->Instance == TIM15) {  // Check if it's TIM2
+    	controlLoop();
+    } else if (htim->Instance == TIM16) {
+    	displayLoop();
+    }
+}
+
+void displayLoop(void) {
+
+}
+
 void userLoop(void) {														// Lowest priority code, handles updating oled display (user inputs are interrupt based)
 	// Some commonly used helper variables
 	HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_ALL);
-	SSD1306_COLOR optionColor[5];
-	uint8_t colorToggle = 1;
+	SSD1306_COLOR optionColor[5] = {White};
+
 	const SSD1306_Font_t *fontSelect;
 	uint8_t fontHeight;
-	setGPIO(OE_pin,GPIO_PIN_SET);
 	while (1) {
 		if ((HAL_GetTick()-timer) > millisecondsPerFrame) {
 			timer = HAL_GetTick();
@@ -119,82 +129,11 @@ void userLoop(void) {														// Lowest priority code, handles updating ole
 				}
 
 			}
-			if (menuState.current_menu->type == Action) {
-
-			} else if (menuState.current_menu->type == Node) {
-
-
-			}
 			if (menuState.current_menu->parent != NULL) {
 				ssd1306_DrawBitmap(110,2,Return_16x8,16,8,White);
 			}
 			ssd1306_DrawBitmap(116,54,Help_16x8,16,8,White);
 			ssd1306_UpdateScreen();
-
-			/*
-			switch (sysState) {
-			case INITIAL_STATE:				// Main menu 3 options: CONTROL_MODE, DEBUG_MODE,      Ė̷͓̝R̶͙̱̈́̇̾͜R̸̤̝̎Ō̶̳̱R̴̖̩͙̎̎͛͜_̴̳̼̰̔͘U̶̻̅N̴̠͉̱͆͂͝Ȁ̷͔̅̇U̸̢̹̓͝T̷̪̮͑H̶͇̯͐͊̚O̶̳̠͝R̵̙̋Ĭ̵̞̘͊̏Z̶͉̼͇͛E̶͖̥͕̍͋D̸̰̄_̸̙̓A̵̦̹̎C̶͇͐̓͂C̴͍͐E̷̗̱̋̚͝S̷̜̯̋̎̎S
-				select += difference;
-				if (select < 0) { select = 0; }
-				else if (select > 2) { select = 2; }
-				if (toggle) {
-					optionColor[select] = Black;
-					toggle = 0;
-				} else {
-					toggle = 1;
-				}
-				oledPrintLinef(Font_11x18, optionColor[0], "Control");
-				ssd1306_SetCursor(2, 20);
-				oledPrintLinef(Font_11x18, optionColor[1], "Debug");
-				ssd1306_SetCursor(2, 40);
-				oledPrintLinef(Font_11x18, optionColor[2], "Other");
-				//ssd1306_DrawBitmap(110,2,Return_16x8,16,8,White);
-				ssd1306_DrawBitmap(116,54,Help_16x8,16,8,White);
-				ssd1306_UpdateScreen();
-
-				break;
-			case INITIAL_HELP:
-
-				break;
-			case CONTROL_MODE:
-
-				break;
-			case CONTROL_HELP:
-
-				break;
-			case DEBUG_MODE:
-
-				break;
-
-
-			case Ė̷͓̝R̶͙̱̈́̇̾͜R̸̤̝̎Ō̶̳̱R̴̖̩͙̎̎͛͜_̴̳̼̰̔͘U̶̻̅N̴̠͉̱͆͂͝Ȁ̷͔̅̇U̸̢̹̓͝T̷̪̮͑H̶͇̯͐͊̚O̶̳̠͝R̵̙̋Ĭ̵̞̘͊̏Z̶͉̼͇͛E̶͖̥͕̍͋D̸̰̄_̸̙̓A̵̦̹̎C̶͇͐̓͂C̴͍͐E̷̗̱̋̚͝S̷̜̯̋̎̎S:
-
-				break;
-			}
-
-			// HAL_TIM_OC_Stop(servo[0].pulseTimerGP, servo[0].TIM_CH_GP);
-			// uint16_t count = __HAL_TIM_GET_COUNTER(&htim15);
-			// uint32_t final = (pc<<16) + (uint32_t)count;
-			// uint32_t estPulses = elapsedTime*1500/1000;
-			ssd1306_Fill(Black);
-			ssd1306_SetCursor(2, 0);
-			oledPrintLinef("Counted: ");
-			ssd1306_SetCursor(2, 20);
-			oledPrintLinef("%d", pc);
-			ssd1306_SetCursor(2, 40);
-			oledPrintLinef("Est: %d", estPulses);
-
-			ssd1306_UpdateScreen();
-			pc = 0;
-			debugFlag = 0;
-
-			timer = HAL_GetTick();
-			HAL_GPIO_TogglePin(LEDs[ledIdx].port, LEDs[ledIdx].pin);
-			ledIdx++;
-			if (ledIdx >= 4) {
-				ledIdx = 0;
-			}
-			*/
 		}
 	}
 }

@@ -27,37 +27,37 @@ uint8_t col = 0;
 SSD1306_COLOR color = White;
 
 // 60 Hz timer interrupt
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {		// Main screen generate frame
-    if (htim->Instance == TIM2) {  // Check if it's TIM2
-    	frames += 1;
-    	ssd1306_DrawBitmap(0,0,gunship,8,8,Black);
-    	/*
-    	ssd1306_DrawPixel(col, row, color);
-
-    	row += 1;
-    	if (row >= SSD1306_HEIGHT) {row = 0; col += 1;}
-    	if (col >= SSD1306_WIDTH) {col = 0;}
-
-    	uint32_t now = HAL_GetTick();
-    	if (now - timer >= 1000) {
-			float fps = (frames * 1000.0f) / (now - timer);  // Use float correctly
-			timer = now;
-			frames = 0;  // Reset frame count
-			ssd1306_SetCursor(2, 0);
-			int len = snprintf(NULL, 0, "FPS: %.2f", fps);
-			char *line1 = malloc(len + 1);
-			snprintf(line1, len + 1, "FPS: %.2f", fps);
-			ssd1306_WriteString(line1, Font_7x10, Black);
-			free(line1);
 
 
-			frames = 0;
+void invadersDrawScreen(void) {
+	frames += 1;
+	ssd1306_DrawBitmap(0,0,gunship,8,8,Black);
+	/*
+	ssd1306_DrawPixel(col, row, color);
 
-		}
-		*/
-		ssd1306_UpdateScreen();
-		//HAL_GPIO_TogglePin(GPIOB,LD2_Pin);
-    }
+	row += 1;
+	if (row >= SSD1306_HEIGHT) {row = 0; col += 1;}
+	if (col >= SSD1306_WIDTH) {col = 0;}
+
+	uint32_t now = HAL_GetTick();
+	if (now - timer >= 1000) {
+		float fps = (frames * 1000.0f) / (now - timer);  // Use float correctly
+		timer = now;
+		frames = 0;  // Reset frame count
+		ssd1306_SetCursor(2, 0);
+		int len = snprintf(NULL, 0, "FPS: %.2f", fps);
+		char *line1 = malloc(len + 1);
+		snprintf(line1, len + 1, "FPS: %.2f", fps);
+		ssd1306_WriteString(line1, Font_7x10, Black);
+		free(line1);
+
+
+		frames = 0;
+
+	}
+	*/
+	ssd1306_UpdateScreen();
+	//HAL_GPIO_TogglePin(GPIOB,LD2_Pin);
 }
 
 //void ship_init(shiptype_t type, )

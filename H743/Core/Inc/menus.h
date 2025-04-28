@@ -12,7 +12,9 @@
 
 typedef enum {
 	Node = 0U,
+	Idle,
 	Action,
+	Motion,
 	Help,
 	Unused
 } MenuType;
@@ -40,6 +42,8 @@ typedef struct {
 
 extern MenuState menuState;
 
+void setSeqFlag(void);
 void setRPM(void);
+void enterMenu(void);
 
 #endif /* INC_MENUS_H_ */

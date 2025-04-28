@@ -13,6 +13,7 @@ Menu MainMenu;
 			Menu SpeedMenu;
 			Menu StepMenu;
 		Menu AutomaticMenu;
+			Menu SequencesMenu;
 	Menu DebugMenu;
 	Menu OtherMenu;
 
@@ -42,43 +43,55 @@ MenuItem SpeedMenuItems[] = {
 	{"RPM", NULL, NULL}
 };
 Menu SpeedMenu = {
-		SpeedMenuItems,
-		sizeof(SpeedMenuItems) / sizeof(SpeedMenuItems[0]),
-		Action,
-		&ManualMenu,
-		&SpeedHelp
+	SpeedMenuItems,
+	sizeof(SpeedMenuItems) / sizeof(SpeedMenuItems[0]),
+	Action,
+	&ManualMenu,
+	&SpeedHelp
 };
 
 
 MenuItem ManualMenuItems[] = {
-	{"Speed", NULL, &SpeedMenu},
-	{"Step", NULL, &StepMenu}
+	{"Speed", enterMenu, &SpeedMenu},
+	{"Step", enterMenu, &StepMenu}
 };
 Menu ManualMenu = {
 	ManualMenuItems,
 	sizeof(ManualMenuItems) / sizeof(ManualMenuItems[0]),
-	Node,
+	Idle,
 	&MainMenu,
 	&ManualHelp
 };
 
+MenuItem SequencesMenuItems[] = {
+		{"sin", setSeqFlag, NULL}
+};
+
+Menu SequencesMenu = {
+	SequencesMenuItems,
+	sizeof(SequencesMenuItems) / sizeof(SequencesMenuItems[0]),
+	Motion,
+	&AutomaticMenu,
+	NULL
+};
 
 MenuItem AutomaticMenuItems[] = {
-	{"Speed", NULL, NULL}
+	{"Sequences", enterMenu, &SequencesMenu},
+	{"Motion", NULL, NULL}
 };
 Menu AutomaticMenu = {
 	AutomaticMenuItems,
 	sizeof(AutomaticMenuItems) / sizeof(AutomaticMenuItems[0]),
-	Unused,
+	Idle,
 	&MainMenu,
 	&AutomaticHelp
 };
 
 
 MenuItem MainMenuItems[] = {
-	{"Manual", NULL, &ManualMenu},
-	{"Automatic", NULL, &AutomaticMenu},
-	{"Other", NULL, NULL}
+	{"Manual", enterMenu, &ManualMenu},
+	{"Automatic", enterMenu, &AutomaticMenu},
+	{"Calibrate", NULL, NULL}
 };
 Menu MainMenu = {
 	MainMenuItems,
@@ -104,6 +117,10 @@ MenuState menuState = {
 	0
 };
 
+void setSeqFlag(void) {
+	sequenceFlag = 1;
+	controlCounter = 0;
+}
 
 void setRPM(void) {
 	int32_t rpm = __HAL_TIM_GET_COUNTER(&htim5);
@@ -112,4 +129,23 @@ void setRPM(void) {
 			setMotorSpeed(rpm*ENCRPMGAIN, servo[i]);
 		}
 	}
+}
+
+void enterMenu(void) {
+	menuState.current_menu = menuState.current_menu->items[menuState.selected_index].submenu;
+	menuState.selected_index = 0;
+	encoderValue = 0;
+	__HAL_TIM_SET_COUNTER(&htim5, 0);
+
+	switch (menuState.current_menu->type) {
+	case Idle:
+		servoInit();
+		break;
+	case Motion:
+		controlInit();
+		break;
+	default:
+		break;
+	}
+
 }

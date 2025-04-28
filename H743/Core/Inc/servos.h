@@ -43,6 +43,8 @@ extern servo_t servo[];
 void UpdateReady(servo_t* s);
 void UpdateTreach(servo_t* s);
 void UpdateEncZ(servo_t* s);
+int32_t get_servo_position(servo_t* s);
+void servoInit(void);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 
 /*

@@ -14,7 +14,6 @@
 #define DELAY 200			// Button delay for debouncing ([ms])
 //#define BASE 2147483648		// Encoder initial value (middle of starts in middle and above/below middle is positive/negative speed
 
-uint8_t oledStatus = 0;
 uint32_t btnATimer;
 uint32_t btnBTimer;
 uint32_t btnEncTimer;
@@ -73,7 +72,7 @@ void btnCallbackB(void) {
 			ssd1306_UpdateScreen();
 			*/
 		#else
-			if (menuState.current_menu->type == Action) {
+			if (menuState.current_menu->type == Idle) {
 				// Slowdown before disabling servo
 				for (int i = 0; i < 4; i++) {
 					setGPIO(servo[i].enablePin, GPIO_PIN_SET);
@@ -94,30 +93,7 @@ void btnCallbackEnc(void) {
 		#ifdef DEBUGGING
 
 		#else
-			/*
-			switch (menuState.current_menu->type) {
-			case Node:
-
-				break;
-			case Action:
-			}*/
-			if (menuState.current_menu->type == Node) {
-				if (menuState.current_menu->items[menuState.selected_index].submenu != NULL) {
-					menuState.current_menu = menuState.current_menu->items[menuState.selected_index].submenu;
-					menuState.selected_index = 0;
-					encoderValue = 0;
-					__HAL_TIM_SET_COUNTER(&htim5, 0);
-					if (menuState.current_menu->type == Action) {
-						for (int i = 0; i < 4; i++) {
-							if (getGPIO(servo[i].readyPin) == GPIO_PIN_RESET) {
-								setGPIO(servo[i].enablePin, GPIO_PIN_RESET);
-								servo[i].enableFlag = 1;
-							}
-						}
-					}
-				}
-
-			} else if (menuState.current_menu->items[0].action != NULL) {
+			if (menuState.current_menu->items[0].action != NULL) {
 				menuState.current_menu->items[0].action();
 			}
 
@@ -141,20 +117,6 @@ void oledInit(void) {
 	}
 	ssd1306_Init();
 
-	//ssd1306_Line(0,0,128,64,White);
-	//ssd1306_DrawBitmap(0,0,stars_128x64,128,64,Black);
-
-	/*
-	ssd1306_Fill(White);
-	ssd1306_DrawBitmap(0,0,mig_128x64,128,64,Black);
-	ssd1306_UpdateScreen();
-	HAL_Delay(1500);
-	ssd1306_Fill(White);
-	ssd1306_DrawBitmap(0,0,MAF_128x64,128,64,Black);
-	ssd1306_UpdateScreen();
-	HAL_Delay(1500);
-	*/
-
 	ssd1306_Fill(White);
 	ssd1306_DrawBitmap(0,0,CoopF_128x64,128,64,Black);
 	ssd1306_UpdateScreen();
@@ -167,16 +129,14 @@ void oledInit(void) {
 	ssd1306_DrawBitmap(0,0,CoopC_128x64,128,64,Black);
 	ssd1306_UpdateScreen();
 
-
 }
 
 uint8_t oledCheck(void) {		// To check if an oled is present
 	if (HAL_I2C_IsDeviceReady(&hi2c4, SSD1306_I2C_ADDR, 1, 10) == HAL_OK) {
-		oledStatus = 1;
+		return 1;
 	} else {
-		oledStatus = 0;
+		return 0;
 	}
-	return oledStatus;
 }
 
 // Public-facing function

@@ -28,6 +28,8 @@ void userInit(void) {
 	interfaceInit();
 	setGPIO(OE_pin,GPIO_PIN_SET);
 	setFPS(10);
+
+	HAL_TIM_Base_Start_IT(&htim4);
 	timer = HAL_GetTick();
 }
 
@@ -46,15 +48,30 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {		// Main screen ge
         	EncUpdate(&servo[0]);
             break;
         case (uintptr_t)TIM2:
-        	EncUpdate(&servo[0]);
+			if (controlMode == REALIGN) {
+				controlMode = IDLE;
+				setMotorSpeed(0, servo[0]);
+				__HAL_TIM_SET_COUNTER(&htim4,0);
+				__HAL_TIM_SET_COUNTER(&htim2,0);
+				__HAL_TIM_SET_AUTORELOAD(&htim2, 65535);
+			} else {
+				EncUpdate(&servo[0]);
+			}
             break;
         case (uintptr_t)TIM3:
-        	EncUpdate(&servo[2]);
+        	EncUpdate(&servo[1]);
             break;
         case (uintptr_t)TIM4:
-        	EncUpdate(&servo[3]);
+			if (controlMode == REALIGN) {
+				controlMode = IDLE;
+				setMotorSpeed(0, servo[0]);
+				//__HAL_TIM_SET_COUNTER(&htim4,0);
+				__HAL_TIM_SET_AUTORELOAD(&htim4, 65535);
+			} else {
+				EncUpdate(&servo[2]);
+			}
             break;
-        case (uintptr_t)TIM15:
+        case (uintptr_t)TIM17:
         	controlLoop();
             break;
         case (uintptr_t)TIM16:
@@ -67,6 +84,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {		// Main screen ge
 }
 
 void userLoop(void) {														// Lowest priority code, handles updating oled display (user inputs are interrupt based)
+
 	while (1) {
 		HAL_Delay(500);
 	}
@@ -139,12 +157,15 @@ void displayLoop(void) {
 		 * Speed, pulses are set each frame for enabled servos (no action on item)
 		*/
 		ssd1306_SetCursor(2, 0);
-		oledPrintLinef(Font_11x18, White, menuState.current_menu->items[0].label);
-		ssd1306_SetCursor(2, 20);
-		oledPrintLinef(Font_11x18, White, "%d", encoderValue*ENCRPMGAIN);
+		oledPrintLinef(Font_7x10, White, menuState.current_menu->items[0].label);
+		ssd1306_SetCursor(2, 12);
+		oledPrintLinef(Font_7x10, White, "%d", encoderValue*ENCRPMGAIN);
 		uint32_t servoEnc = servo[0].position + __HAL_TIM_GET_COUNTER(&htim2);
-		ssd1306_SetCursor(2, 40);
-		oledPrintLinef(Font_11x18, White, "%d", servoEnc);
+		uint32_t servoCount = servo[2].position + __HAL_TIM_GET_COUNTER(&htim4);
+		ssd1306_SetCursor(2, 24);
+		oledPrintLinef(Font_7x10, White, "%d", servoEnc);
+		ssd1306_SetCursor(2, 36);
+		oledPrintLinef(Font_7x10, White, "%d", servoCount*20);
 		if (menuState.current_menu->items[0].action == NULL) {
 			for (int i = 0; i < 4; i++) {
 				if (servo[i].enableFlag) {

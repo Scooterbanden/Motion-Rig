@@ -19,6 +19,15 @@
 #include <servos.h>
 #include "stdlib.h"
 
+
+// Struct instances
+servo_t servo[] = {
+    {0, {GPIOD, S1_Ready_Pin}, 0, {GPIOD, S1_Treach_Pin}, 0, {GPIOD, S1_Enable_Pin}, 0, {GPIOD, S1_Direction_Pin}, 0, &htim8, TIM_CHANNEL_4, HRTIM_TIMERINDEX_TIMER_C, &htim2, 0, 0},
+	{0, {GPIOA, S2_Ready_Pin}, 0, {GPIOA, S2_Treach_Pin}, 0, {GPIOD, S2_Enable_Pin}, 0, {GPIOC, S2_Direction_Pin}, 0, &htim12, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_B, &htim3, 0, 0},
+	{0, {GPIOB, S3_Ready_Pin}, 0, {GPIOD, S3_Treach_Pin}, 0, {GPIOD, S3_Enable_Pin}, 0, {GPIOD, S3_Direction_Pin}, 0, &htim14, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_A, &htim4, 0, 0},
+	{0, {GPIOE, S4_Ready_Pin}, 0, {GPIOB, S4_Treach_Pin}, 0, {GPIOE, S4_Enable_Pin}, 0, {GPIOE, S4_Direction_Pin}, 0, &htim13, TIM_CHANNEL_1, 0, &htim1, 0, 0}
+};
+
 void ReadyFunc(servo_t* s) {
 	s->readyFlag = !HAL_GPIO_ReadPin(s->readyPin.port, s->readyPin.pin);
 }
@@ -40,7 +49,7 @@ void EncZFunc(servo_t* s) {
 
 void servoInit(void) {
 	for (int i = 0; i < 4; i++) {
-		if (getGPIO(servo[i].readyPin) == GPIO_PIN_RESET) {
+		if ((getGPIO(servo[i].readyPin) == GPIO_PIN_RESET) | (i==0)) {
 			setGPIO(servo[i].enablePin, GPIO_PIN_RESET);
 			servo[i].enableFlag = 1;
 			__HAL_TIM_SET_COUNTER(servo[i].encoder, 0);
@@ -64,13 +73,7 @@ int32_t get_servo_position(servo_t* s)
 
     return pos1 + cnt1;
 }
-// Struct instances for EXTI-related events
-servo_t servo[] = {
-    {0, {GPIOD, S1_Ready_Pin}, 0, {GPIOD, S1_Treach_Pin}, 0, {GPIOD, S1_Enable_Pin}, 0, {GPIOD, S1_Direction_Pin}, 0, &htim8, TIM_CHANNEL_4, HRTIM_TIMERINDEX_TIMER_C, &htim2, 0, 0},
-	{0, {GPIOA, S2_Ready_Pin}, 0, {GPIOA, S2_Treach_Pin}, 0, {GPIOD, S2_Enable_Pin}, 0, {GPIOC, S2_Direction_Pin}, 0, &htim12, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_B, &htim3, 0, 0},
-	{0, {GPIOB, S3_Ready_Pin}, 0, {GPIOD, S3_Treach_Pin}, 0, {GPIOD, S3_Enable_Pin}, 0, {GPIOD, S3_Direction_Pin}, 0, &htim14, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_A, &htim4, 0, 0},
-	{0, {GPIOE, S4_Ready_Pin}, 0, {GPIOB, S4_Treach_Pin}, 0, {GPIOE, S4_Enable_Pin}, 0, {GPIOE, S4_Direction_Pin}, 0, &htim13, TIM_CHANNEL_1, 0, &htim1, 0, 0}
-};
+
 
 // Individual handler functions that call the struct update function
 void Handle_EXTI0(void)  { EncZFunc(&servo[0]); }

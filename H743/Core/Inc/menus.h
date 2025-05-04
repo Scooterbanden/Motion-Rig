@@ -42,6 +42,7 @@ typedef struct {
 
 extern MenuState menuState;
 
+void setStepFlag(void);
 void setSeqFlag(void);
 void setRPM(void);
 void enterMenu(void);

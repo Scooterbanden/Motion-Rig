@@ -11,11 +11,23 @@
 #define CLOCKFREQ 20000000
 #define RPM2FREQ 25/3
 
+typedef enum {
+	IDLE = 0U,
+	SEQUENCE,
+	SPEED,
+	STEP,
+	GAME,
+	REALIGN
+} ControlMode;
+
+extern uint16_t stepRef;
 extern uint8_t sequenceFlag;
 extern uint32_t controlCounter;
+extern ControlMode controlMode;
 
 void controlInit(void);
 void controlLoop(void);
 void setMotorSpeed(int16_t rpm, servo_t servo);
+void send_int32_uart(int32_t value);
 
 #endif /* INC_CONTROL_H_ */

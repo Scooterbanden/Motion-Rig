@@ -28,7 +28,7 @@ Menu MainMenu;
 		Menu OtherHelp;
 
 MenuItem StepMenuItems[] = {
-	{"Set RPM", setRPM, NULL}
+	{"Set RPM", setStepFlag, NULL}
 };
 Menu StepMenu = {
 		StepMenuItems,
@@ -117,9 +117,15 @@ MenuState menuState = {
 	0
 };
 
-void setSeqFlag(void) {
-	sequenceFlag = 1;
+void setStepFlag(void) {
 	controlCounter = 0;
+	int32_t encoderValue = __HAL_TIM_GET_COUNTER(&htim5);
+	stepRef = encoderValue*20;
+	controlMode = STEP;
+}
+void setSeqFlag(void) {
+	controlCounter = 0;
+	controlMode = SEQUENCE;
 }
 
 void setRPM(void) {
@@ -142,6 +148,7 @@ void enterMenu(void) {
 		servoInit();
 		break;
 	case Motion:
+	case Action:
 		controlInit();
 		break;
 	default:

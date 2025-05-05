@@ -14,7 +14,7 @@
 
 // Test times [ms]
 #define STEPTESTTIME 5000
-#define SEQUENCETESTTIME 100000
+#define SEQUENCETESTTIME 200000
 uint8_t sequenceFlag = 0;
 uint32_t pc = 0;
 uint32_t controlCounter = 0;
@@ -47,7 +47,7 @@ void controlLoop(void) {
 		if (controlCounter >= SEQUENCETESTTIME) {
 			setMotorSpeed(0, servo[0]);
 			controlCounter = 0;
-			controlMode = REALIGN;
+			controlMode = CONSTSPEED;
 		}
 		break;
 	case SPEED:
@@ -74,11 +74,23 @@ void controlLoop(void) {
 			int32_t offset = 10000 - (servoEnc%10000);
 			__HAL_TIM_SET_COUNTER(&htim4,0);
 			servo[2].position = 0;
-			__HAL_TIM_SET_AUTORELOAD(&htim4, 1000);
+			__HAL_TIM_SET_AUTORELOAD(&htim4, offset/20);
 		} else if (controlCounter > 1000) {
 			setMotorSpeed(50,servo[0]);
 		}
 		controlCounter++;
+		break;
+	case CONSTSPEED:
+		if (controlCounter > 1000) {
+			setMotorSpeed(200,servo[0]);
+		}
+		controlCounter++;
+		if (controlCounter > 6000) {
+			setMotorSpeed(0, servo[0]);
+			controlCounter = 0;
+			controlMode = REALIGN;
+		}
+		break;
 	}
 }
 

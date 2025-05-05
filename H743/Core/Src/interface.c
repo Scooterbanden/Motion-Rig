@@ -128,6 +128,7 @@ void oledInit(void) {
 	ssd1306_Fill(White);
 	ssd1306_DrawBitmap(0,0,CoopC_128x64,128,64,Black);
 	ssd1306_UpdateScreen();
+	HAL_Delay(400);
 
 }
 

@@ -17,6 +17,7 @@ typedef enum {
 	SPEED,
 	STEP,
 	GAME,
+	CONSTSPEED,
 	REALIGN
 } ControlMode;
 

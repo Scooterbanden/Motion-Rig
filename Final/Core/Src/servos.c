@@ -34,7 +34,11 @@ void ReadyFunc(servo_t* s) {
 
 void TreachFunc(servo_t* s) {
 	s->TreachFlag = !HAL_GPIO_ReadPin(s->TreachPin.port, s->TreachPin.pin);
+<<<<<<< HEAD
 	//HAL_TIM_OC_Stop(s->pulseTimerGP, s->TIM_CH_GP);
+=======
+	HAL_TIM_OC_Stop(s->pulseTimerGP, s->TIM_CH_GP);
+>>>>>>> 95061b66cf3de183b78b99d8b6c8d2de6fac6fe5
 }
 
 void EncZFunc(servo_t* s) {

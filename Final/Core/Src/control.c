@@ -44,7 +44,11 @@ void controlLoop(void) {
 		servoEnc = get_servo_position(&servo[0]);
 		servoCount = get_servo_position(&servo[2]);
 		//error = servoCount*20 - servoEnc;
+<<<<<<< HEAD
 		send_int32_uart(servoCount*20,servoEnc);
+=======
+		send_int32_uart(servoCount,servoEnc);
+>>>>>>> 95061b66cf3de183b78b99d8b6c8d2de6fac6fe5
 		controlCounter++;
 		if (controlCounter >= seqTestTime) {
 			setMotorSpeed(0, &servo[0]);

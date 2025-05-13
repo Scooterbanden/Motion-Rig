@@ -54,7 +54,7 @@ void EncZFunc(servo_t* s) {
 
 void servoInit(void) {
 	for (int i = 0; i < 4; i++) {
-		if ((getGPIO(servo[i].readyPin) == GPIO_PIN_RESET) | (i==0)) {
+		if ((getGPIO(servo[i].readyPin) == GPIO_PIN_RESET)) {
 			setGPIO(servo[i].enablePin, GPIO_PIN_SET);
 			servo[i].enableFlag = 1;
 			__HAL_TIM_SET_COUNTER(servo[i].encoder.encoder, 0);

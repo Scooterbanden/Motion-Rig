@@ -150,9 +150,9 @@ void displayLoop(void) {
 			ssd1306_SetCursor(2, i*fontHeight);
 			oledPrintLinef(*fontSelect, optionColor[i], menuState.current_menu->items[i].label);
 		}
-		ssd1306_Fill(Black);
-		ssd1306_SetCursor(2, 0);
-		oledPrintLinef(Font_7x10, White, "%d", encoderValue);
+		//ssd1306_Fill(Black);
+		//ssd1306_SetCursor(2, 0);
+		//oledPrintLinef(Font_7x10, White, "%d", encoderValue);
 		break;
 
 	case Action:

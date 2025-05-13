@@ -446,10 +446,10 @@ static void MX_LPTIM2_Init(void)
   hlptim2.Init.Clock.Source = LPTIM_CLOCKSOURCE_APBCLOCK_LPOSC;
   hlptim2.Init.Clock.Prescaler = LPTIM_PRESCALER_DIV1;
   hlptim2.Init.UltraLowPowerClock.Polarity = LPTIM_CLOCKPOLARITY_RISING;
-  hlptim2.Init.UltraLowPowerClock.SampleTime = LPTIM_CLOCKSAMPLETIME_2TRANSITIONS;
+  hlptim2.Init.UltraLowPowerClock.SampleTime = LPTIM_CLOCKSAMPLETIME_DIRECTTRANSITION;
   hlptim2.Init.Trigger.Source = LPTIM_TRIGSOURCE_SOFTWARE;
   hlptim2.Init.OutputPolarity = LPTIM_OUTPUTPOLARITY_HIGH;
-  hlptim2.Init.UpdateMode = LPTIM_UPDATE_IMMEDIATE;
+  hlptim2.Init.UpdateMode = LPTIM_UPDATE_ENDOFPERIOD;
   hlptim2.Init.CounterSource = LPTIM_COUNTERSOURCE_EXTERNAL;
   hlptim2.Init.Input1Source = LPTIM_INPUT1SOURCE_GPIO;
   hlptim2.Init.Input2Source = LPTIM_INPUT2SOURCE_GPIO;

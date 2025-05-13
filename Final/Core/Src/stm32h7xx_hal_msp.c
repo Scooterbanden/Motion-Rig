@@ -338,14 +338,14 @@ void HAL_LPTIM_MspInit(LPTIM_HandleTypeDef* hlptim)
     */
     GPIO_InitStruct.Pin = Alt_EncA_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF3_LPTIM2;
     HAL_GPIO_Init(Alt_EncA_GPIO_Port, &GPIO_InitStruct);
 
     GPIO_InitStruct.Pin = Alt_EncB_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF3_LPTIM2;
     HAL_GPIO_Init(Alt_EncB_GPIO_Port, &GPIO_InitStruct);

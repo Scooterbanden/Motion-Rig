@@ -69,8 +69,6 @@ void Error_Handler(void);
 #define Config_2_GPIO_Port GPIOE
 #define Config_3_Pin GPIO_PIN_5
 #define Config_3_GPIO_Port GPIOE
-#define Config_4_Pin GPIO_PIN_6
-#define Config_4_GPIO_Port GPIOE
 #define UI_EncA_Pin GPIO_PIN_0
 #define UI_EncA_GPIO_Port GPIOA
 #define UI_EncB_Pin GPIO_PIN_1

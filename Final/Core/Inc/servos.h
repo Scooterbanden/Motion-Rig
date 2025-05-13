@@ -10,9 +10,22 @@
 
 #include <customMain.h>
 #include "stm32h7xx_hal.h"
+#define STROKE_T 300
+#define STROKE_LR 300
+#define MM2PULSE 2500
 
 // Forward declaration
 struct servo_t;
+struct encoder_t;
+
+struct encoder_t {
+	TIM_HandleTypeDef* encoder;
+	uint32_t position;
+	GPIO_t encZpin;
+	uint32_t lastZ;
+};
+
+typedef struct encoder_t encoder_t;
 
 // Define the struct (No `typedef` here)
 struct servo_t {
@@ -28,21 +41,25 @@ struct servo_t {
 	TIM_HandleTypeDef* pulseTimerGP;
 	uint32_t TIM_CH_GP;
 	uint32_t TIM_CH_HR;
-	TIM_HandleTypeDef* encoder;
-	uint32_t position;
-	uint32_t lastZ;
+	encoder_t encoder;
+	uint8_t ParkedFlag;
 };
+
+
+
 
 // Make `MyStruct` a typedef after the struct is fully defined
 typedef struct servo_t servo_t;
 
 // External reference to the struct array
+extern encoder_t pulseCounters[];
 extern servo_t servo[];
 
 // Function prototypes
 void UpdateReady(servo_t* s);
 void UpdateTreach(servo_t* s);
 void UpdateEncZ(servo_t* s);
+int32_t get_sent_pulses(encoder_t* e);
 int32_t get_servo_position(servo_t* s);
 void servoInit(void);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);

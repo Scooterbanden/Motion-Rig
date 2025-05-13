@@ -68,6 +68,8 @@ void TIM4_IRQHandler(void);
 void USART2_IRQHandler(void);
 void USART3_IRQHandler(void);
 void EXTI15_10_IRQHandler(void);
+void TIM8_BRK_TIM12_IRQHandler(void);
+void TIM5_IRQHandler(void);
 void OTG_FS_IRQHandler(void);
 void TIM16_IRQHandler(void);
 void TIM17_IRQHandler(void);

@@ -11,6 +11,7 @@
 #define CLOCKFREQ 20000000
 #define RPM2FREQ 25/3
 
+
 typedef enum {
 	IDLE = 0U,
 	SEQUENCE,
@@ -18,7 +19,10 @@ typedef enum {
 	STEP,
 	GAME,
 	CONSTSPEED,
-	REALIGN
+	REALIGN,
+	CALIBRATE,
+	PARK,
+	VALIDATION
 } ControlMode;
 
 extern float freqScale;

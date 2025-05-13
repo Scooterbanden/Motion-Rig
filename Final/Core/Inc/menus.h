@@ -42,6 +42,7 @@ typedef struct {
 
 extern MenuState menuState;
 
+void startCalibration(void);
 void startSeq1(void);
 void startSeq2(void);
 void startSeq3(void);

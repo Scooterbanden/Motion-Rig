@@ -19,13 +19,18 @@
 #include <servos.h>
 #include "stdlib.h"
 
+encoder_t pulseCounters[] = {
+		{&htim5, 0, {GPIOD, S1_EncZ_Pin}, 0},
+		{&htim1, 0, {GPIOB, S4_EncZ_Pin}, 0},
+		{&htim12, 0, {GPIOB, S4_EncZ_Pin}, 0}
+};
 
 // Struct instances
 servo_t servo[] = {
-    {0, {GPIOD, S1_Ready_Pin}, 0, {GPIOD, S1_Treach_Pin}, 0, {GPIOD, S1_Enable_Pin}, 0, {GPIOD, S1_Direction_Pin}, 0, &htim8, TIM_CHANNEL_4, HRTIM_TIMERINDEX_TIMER_C, &htim3, 0, 0},
-	{0, {GPIOA, S2_Ready_Pin}, 0, {GPIOA, S2_Treach_Pin}, 0, {GPIOD, S2_Enable_Pin}, 0, {GPIOC, S2_Direction_Pin}, 0, &htim12, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_B, &htim2, 0, 0},
-	{0, {GPIOB, S3_Ready_Pin}, 0, {GPIOD, S3_Treach_Pin}, 0, {GPIOD, S3_Enable_Pin}, 0, {GPIOD, S3_Direction_Pin}, 0, &htim14, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_A, &htim4, 0, 0},
-	{0, {GPIOE, S4_Ready_Pin}, 0, {GPIOB, S4_Treach_Pin}, 0, {GPIOE, S4_Enable_Pin}, 0, {GPIOE, S4_Direction_Pin}, 0, &htim13, TIM_CHANNEL_1, 0, &htim1, 0, 0}
+    {0, {GPIOD, S1_Ready_Pin}, 0, {GPIOD, S1_Treach_Pin}, 0, {GPIOD, S1_Enable_Pin}, 0, {GPIOD, S1_Direction_Pin}, 0, &htim8, TIM_CHANNEL_4, HRTIM_TIMERINDEX_TIMER_C, {&htim3, 0, {GPIOD, S1_EncZ_Pin}, 0}, 0},
+	{0, {GPIOA, S2_Ready_Pin}, 0, {GPIOA, S2_Treach_Pin}, 0, {GPIOD, S2_Enable_Pin}, 0, {GPIOC, S2_Direction_Pin}, 0, &htim15, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_B, {&htim2, 0, {GPIOC, S2_EncZ_Pin}, 0}, 0},
+	{0, {GPIOB, S3_Ready_Pin}, 0, {GPIOD, S3_Treach_Pin}, 0, {GPIOD, S3_Enable_Pin}, 0, {GPIOD, S3_Direction_Pin}, 0, &htim14, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_A, {&htim4, 0, {GPIOD, S3_EncZ_Pin}, 0}, 0},
+	{0, {GPIOE, S4_Ready_Pin}, 0, {GPIOB, S4_Treach_Pin}, 0, {GPIOE, S4_Enable_Pin}, 0, {GPIOE, S4_Direction_Pin}, 0, &htim13, TIM_CHANNEL_1, 0, {&htim1, 0, {GPIOB, S4_EncZ_Pin}, 0}, 0}
 };
 
 void ReadyFunc(servo_t* s) {
@@ -33,17 +38,13 @@ void ReadyFunc(servo_t* s) {
 }
 
 void TreachFunc(servo_t* s) {
-	s->TreachFlag = !HAL_GPIO_ReadPin(s->TreachPin.port, s->TreachPin.pin);
-<<<<<<< HEAD
-	//HAL_TIM_OC_Stop(s->pulseTimerGP, s->TIM_CH_GP);
-=======
+	s->TreachFlag = 1;
 	HAL_TIM_OC_Stop(s->pulseTimerGP, s->TIM_CH_GP);
->>>>>>> 95061b66cf3de183b78b99d8b6c8d2de6fac6fe5
 }
 
 void EncZFunc(servo_t* s) {
-	uint32_t encoder_count = __HAL_TIM_GET_COUNTER(s->encoder);
-	uint32_t countDifference = encoder_count - s->lastZ;
+	uint32_t encoder_count = __HAL_TIM_GET_COUNTER(s->encoder.encoder);
+	uint32_t countDifference = encoder_count - s->encoder.lastZ;
 	if ((abs(countDifference) < 5) | (abs(abs(countDifference)- 10000) < 5)) {
 		// Pretty much fine
 	} else {
@@ -56,12 +57,11 @@ void servoInit(void) {
 		if ((getGPIO(servo[i].readyPin) == GPIO_PIN_RESET) | (i==0)) {
 			setGPIO(servo[i].enablePin, GPIO_PIN_SET);
 			servo[i].enableFlag = 1;
-			__HAL_TIM_SET_COUNTER(servo[i].encoder, 0);
-			HAL_TIM_Encoder_Start(servo[i].encoder, TIM_CHANNEL_ALL);
-			HAL_TIM_Base_Start_IT(servo[i].encoder);
+			__HAL_TIM_SET_COUNTER(servo[i].encoder.encoder, 0);
+			HAL_TIM_Encoder_Start(servo[i].encoder.encoder, TIM_CHANNEL_ALL);
+			HAL_TIM_Base_Start_IT(servo[i].encoder.encoder);
 		}
 	}
-	HAL_TIM_Base_Start_IT(servo[2].encoder);
 }
 
 int32_t get_servo_position(servo_t* s)
@@ -72,9 +72,25 @@ int32_t get_servo_position(servo_t* s)
 
     do
     {
-        pos1 = s->position;
-        cnt1 = __HAL_TIM_GET_COUNTER(s->encoder);
-        pos2 = s->position;
+        pos1 = s->encoder.position;
+        cnt1 = __HAL_TIM_GET_COUNTER(s->encoder.encoder);
+        pos2 = s->encoder.position;
+    } while (pos1 != pos2);
+
+    return pos1 + cnt1;
+}
+
+int32_t get_sent_pulses(encoder_t* e)
+{
+	// Race condition resistant position reading
+    int32_t pos1, pos2;
+    uint16_t cnt1;
+
+    do
+    {
+        pos1 = e->position;
+        cnt1 = __HAL_TIM_GET_COUNTER(e->encoder);
+        pos2 = e->position;
     } while (pos1 != pos2);
 
     return pos1 + cnt1;

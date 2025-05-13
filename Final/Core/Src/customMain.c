@@ -16,7 +16,7 @@ uint32_t timer;
 uint8_t debugFlag = 0;
 
 
-GPIO_t configs[5] = {{GPIOE, Config_0_Pin},{GPIOE, Config_1_Pin},{GPIOE, Config_2_Pin},{GPIOE, Config_3_Pin},{GPIOE, Config_4_Pin}};
+GPIO_t configs[4] = {{GPIOE, Config_0_Pin},{GPIOE, Config_1_Pin},{GPIOE, Config_2_Pin},{GPIOE, Config_3_Pin}};
 
 uint8_t colorToggle = 1;
 const SSD1306_Font_t *fontSelect;
@@ -31,25 +31,25 @@ void userInit(void) {
 	timer = HAL_GetTick();
 }
 
-void EncUpdate(servo_t* s) {
+void EncUpdate(encoder_t* e) {
 	// Handle overflow or underflow logic
-	if (__HAL_TIM_IS_TIM_COUNTING_DOWN(s->encoder)) {
-		s->position -= 65536;
+	if (__HAL_TIM_IS_TIM_COUNTING_DOWN(e->encoder)) {
+		e->position -= 65536;
 	} else {
-		s->position += 65536;
+		e->position += 65536;
 	}
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {		// Main screen generate frame
     switch ((uintptr_t)htim->Instance) {  // Cast the timer instance to uintptr_t for comparison
         case (uintptr_t)TIM1:
-        	EncUpdate(&servo[3]);
+        	EncUpdate(&pulseCounters[1]);
             break;
         case (uintptr_t)TIM2:
-			EncUpdate(&servo[1]);
+			EncUpdate(&servo[1].encoder);
             break;
         case (uintptr_t)TIM3:
-        	EncUpdate(&servo[0]);
+        	EncUpdate(&servo[0].encoder);
             break;
         case (uintptr_t)TIM4:
 			if (controlMode == REALIGN) {
@@ -58,9 +58,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {		// Main screen ge
 				//__HAL_TIM_SET_COUNTER(&htim4,0);
 				__HAL_TIM_SET_AUTORELOAD(&htim4, 65535);
 			} else {
-				EncUpdate(&servo[2]);
+				EncUpdate(&servo[2].encoder);
 			}
             break;
+        case (uintptr_t)TIM5:
+        	EncUpdate(&pulseCounters[0]);
+        case (uintptr_t)TIM12:
+        	EncUpdate(&pulseCounters[2]);
+        	break;
         case (uintptr_t)TIM17:
         	controlLoop();
             break;
@@ -91,7 +96,7 @@ void userLoop(void) {														// Lowest priority code, handles updating ole
 void displayLoop(void) {
 	SSD1306_COLOR optionColor[5] = {White};
 	ssd1306_Fill(Black);
-	int32_t newEncoderValue = __HAL_TIM_GET_COUNTER(&htim5);
+	int32_t newEncoderValue = HAL_LPTIM_ReadCounter(&hlptim2);;
 	int32_t difference = newEncoderValue - encoderValue;
 	encoderValue = newEncoderValue;
 	switch (menuState.current_menu->type) {
@@ -145,6 +150,9 @@ void displayLoop(void) {
 			ssd1306_SetCursor(2, i*fontHeight);
 			oledPrintLinef(*fontSelect, optionColor[i], menuState.current_menu->items[i].label);
 		}
+		ssd1306_Fill(Black);
+		ssd1306_SetCursor(2, 0);
+		oledPrintLinef(Font_7x10, White, "%d", encoderValue);
 		break;
 
 	case Action:

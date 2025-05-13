@@ -16,6 +16,9 @@
 int32_t stepTestTime = 5000;
 int32_t seqTestTime = 200000;
 
+int valDir = 1;
+int valSpeed = 50;
+
 float freqScale;
 float rpmAmplitude;
 float freqInitial = 0.001;
@@ -43,12 +46,7 @@ void controlLoop(void) {
 		setMotorSpeed((int16_t)(rpm), &servo[0]);
 		servoEnc = get_servo_position(&servo[0]);
 		servoCount = get_servo_position(&servo[2]);
-		//error = servoCount*20 - servoEnc;
-<<<<<<< HEAD
 		send_int32_uart(servoCount*20,servoEnc);
-=======
-		send_int32_uart(servoCount,servoEnc);
->>>>>>> 95061b66cf3de183b78b99d8b6c8d2de6fac6fe5
 		controlCounter++;
 		if (controlCounter >= seqTestTime) {
 			setMotorSpeed(0, &servo[0]);
@@ -64,7 +62,6 @@ void controlLoop(void) {
 		setMotorSpeed(stepRef,&servo[0]);
 		servoEnc = get_servo_position(&servo[0]);
 		servoCount = get_servo_position(&servo[2]);
-		//error = servoCount*20 - servoEnc;
 		send_int32_uart(servoCount,servoEnc);
 		controlCounter++;
 		if (controlCounter >= stepTestTime) {
@@ -78,7 +75,7 @@ void controlLoop(void) {
 			servoEnc = get_servo_position(&servo[0]);
 			int32_t offset = 10000 - (servoEnc%10000);
 			__HAL_TIM_SET_COUNTER(&htim4,0);
-			servo[2].position = 0;
+			servo[2].encoder.position = 0;
 			__HAL_TIM_SET_AUTORELOAD(&htim4, offset/20);
 		} else if (controlCounter > 1000) {
 			setMotorSpeed(50,&servo[0]);
@@ -95,6 +92,93 @@ void controlLoop(void) {
 			controlCounter = 0;
 			controlMode = REALIGN;
 		}
+		break;
+	case CALIBRATE:
+		int running = 0;
+		for (int i = 0; i < 4; i++) {
+			if ((servo[i].enableFlag) && !(servo[i].TreachFlag)) {
+				running++;
+				setMotorSpeed(-50,&servo[i]);
+			}
+		}
+		if (running == 0) {
+			for (int i = 0; i < 4; i++) {
+				if (servo[i].enableFlag) {
+					__HAL_TIM_SET_COUNTER(servo[i].encoder.encoder,0);
+					servo[i].encoder.position = 0;
+				}
+			}
+			controlMode = PARK;
+		}
+		break;
+	case PARK:
+		int parking = 0;
+		for (int i = 0; i < 4; i++) {
+			if (servo[i].enableFlag) {
+				if (get_servo_position(&servo[i]) >= STROKE_T/2*MM2PULSE) {
+					servo[i].ParkedFlag = 1;
+					setMotorSpeed(0,&servo[i]);
+				}
+				if (!(servo[i].ParkedFlag)) {
+					parking++;
+					setMotorSpeed(50,&servo[i]);
+				}
+			}
+		}
+		if (parking == 0) {
+			controlMode = VALIDATION;
+			for (int i = 0; i < 4; i++) {
+				servo[i].ParkedFlag = 0;
+			}
+		}
+		break;
+	case VALIDATION:
+		int going = 0;
+		for (int i = 0; i < 4; i++) {
+			if (servo[i].enableFlag) {
+				switch (valDir) {
+				case 1:
+					if (get_servo_position(&servo[i]) >= (uint16_t)(STROKE_T*0.8*MM2PULSE)) {
+						servo[i].ParkedFlag = 1;
+						setMotorSpeed(0,&servo[i]);
+					}
+					break;
+				case -1:
+					if (get_servo_position(&servo[i]) <= (uint16_t)(STROKE_T*0.2*MM2PULSE)) {
+						servo[i].ParkedFlag = 1;
+						setMotorSpeed(0,&servo[i]);
+					}
+					break;
+				}
+				if (!(servo[i].ParkedFlag)) {
+					going++;
+					setMotorSpeed(50*valDir,&servo[i]);
+				}
+			}
+		}
+		if (going == 0) {
+			if (valDir == 1) {
+				valDir = -1;
+				for (int i = 0; i < 4; i++) {
+					servo[i].ParkedFlag = 0;
+				}
+			} else {
+				valDir = 1;
+				for (int i = 0; i < 4; i++) {
+					servo[i].ParkedFlag = 0;
+				}
+				valSpeed = valSpeed*2;
+				if (valSpeed < 500) {
+					controlMode = IDLE;
+				}
+			}
+		}
+		for (int i = 0; i < 3; i++) {
+			servoEnc = get_servo_position(&servo[i]);
+			servoCount = get_sent_pulses(&pulseCounters[i]);
+			send_int32_uart(servoCount*20,servoEnc);
+		}
+
 		break;
 	}
 }

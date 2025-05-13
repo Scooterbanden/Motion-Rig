@@ -93,7 +93,7 @@ Menu AutomaticMenu = {
 MenuItem MainMenuItems[] = {
 	{"Manual", enterMenu, &ManualMenu},
 	{"Automatic", enterMenu, &AutomaticMenu},
-	{"Calibrate", NULL, NULL}
+	{"Calibrate", startCalibration, NULL}
 };
 Menu MainMenu = {
 	MainMenuItems,
@@ -118,6 +118,13 @@ MenuState menuState = {
 	&MainMenu,
 	0
 };
+
+void startCalibration(void) {
+	servoInit();
+	controlInit();
+	controlCounter = 0;
+	controlMode = CALIBRATE;
+}
 
 void setStepFlag(void) {
 	controlCounter = 0;

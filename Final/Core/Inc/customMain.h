@@ -66,6 +66,7 @@ extern TIM_HandleTypeDef htim17;
 extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart3;
 
+void CountUpdate(pulseCounter_t* c);
 void EncUpdate(encoder_t* e);
 void userInit(void);
 void userLoop(void);

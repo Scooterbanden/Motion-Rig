@@ -26,8 +26,6 @@ void userInit(void) {
 	oledInit();
 	interfaceInit();
 	setFPS(10);
-
-	HAL_TIM_Base_Start_IT(&htim4);
 	timer = HAL_GetTick();
 }
 
@@ -40,10 +38,19 @@ void EncUpdate(encoder_t* e) {
 	}
 }
 
+void CountUpdate(pulseCounter_t* c) {
+	// Handle overflow or underflow logic
+	if (__HAL_TIM_IS_TIM_COUNTING_DOWN(c->timer)) {
+		c->count -= 65536;
+	} else {
+		c->count += 65536;
+	}
+}
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {		// Main screen generate frame
     switch ((uintptr_t)htim->Instance) {  // Cast the timer instance to uintptr_t for comparison
         case (uintptr_t)TIM1:
-        	EncUpdate(&pulseCounters[1]);
+        	CountUpdate(&servo[1].counter);
             break;
         case (uintptr_t)TIM2:
 			EncUpdate(&servo[1].encoder);
@@ -62,10 +69,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {		// Main screen ge
 			}
             break;
         case (uintptr_t)TIM5:
-        	EncUpdate(&pulseCounters[0]);
+        	CountUpdate(&servo[0].counter);
         case (uintptr_t)TIM12:
-        	EncUpdate(&pulseCounters[2]);
+        	//servo[2].counter.count++;
         	break;
+        case (uintptr_t)TIM15:
+			if (getGPIO(servo[2].directionPin) == GPIO_PIN_SET) {
+				servo[2].counter.count--;
+			} else {
+				servo[2].counter.count++;
+			}
         case (uintptr_t)TIM17:
         	controlLoop();
             break;
@@ -85,7 +98,7 @@ void userLoop(void) {														// Lowest priority code, handles updating ole
 	while (1) {
 		HAL_GPIO_TogglePin(LEDs[ledIdx].port, LEDs[ledIdx].pin);
 		ledIdx = ledIdx + ledDir;
-		if ((ledIdx > 8) | (ledIdx < 0)) {
+		if ((ledIdx > 7) | (ledIdx < 0)) {
 			ledDir = -ledDir;
 			ledIdx = ledIdx + ledDir;
 		}

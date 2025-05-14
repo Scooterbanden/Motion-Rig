@@ -110,7 +110,7 @@ void interfaceInit(void) {
 	btnATimer = initTime;
 	btnBTimer = initTime;
 	btnEncTimer = initTime;
-	HAL_TIM_Encoder_Start(&htim5, TIM_CHANNEL_ALL);		// User encoder
+	//HAL_TIM_Encoder_Start(&htim5, TIM_CHANNEL_ALL);		// User encoder
 	HAL_LPTIM_Encoder_Start(&hlptim2, 0xFFFF);
 	encoderValue = HAL_LPTIM_ReadCounter(&hlptim2);
 }

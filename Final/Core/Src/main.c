@@ -795,14 +795,14 @@ static void MX_TIM12_Init(void)
 
   /* USER CODE END TIM12_Init 0 */
 
-  TIM_SlaveConfigTypeDef sSlaveConfig = {0};
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
 
   /* USER CODE BEGIN TIM12_Init 1 */
 
   /* USER CODE END TIM12_Init 1 */
   htim12.Instance = TIM12;
-  htim12.Init.Prescaler = 0;
+  htim12.Init.Prescaler = 5;
   htim12.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim12.Init.Period = 65535;
   htim12.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -811,9 +811,8 @@ static void MX_TIM12_Init(void)
   {
     Error_Handler();
   }
-  sSlaveConfig.SlaveMode = TIM_SLAVEMODE_EXTERNAL1;
-  sSlaveConfig.InputTrigger = TIM_TS_ITR3;
-  if (HAL_TIM_SlaveConfigSynchro(&htim12, &sSlaveConfig) != HAL_OK)
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim12, &sClockSourceConfig) != HAL_OK)
   {
     Error_Handler();
   }
@@ -961,7 +960,7 @@ static void MX_TIM15_Init(void)
   {
     Error_Handler();
   }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_OC2REF;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim15, &sMasterConfig) != HAL_OK)
   {
@@ -1207,8 +1206,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : UI_Sw_Pin S2_Ready_Pin S2_Treach_Pin */
-  GPIO_InitStruct.Pin = UI_Sw_Pin|S2_Ready_Pin|S2_Treach_Pin;
+  /*Configure GPIO pins : UI_Sw_Pin S2_Ready_Pin */
+  GPIO_InitStruct.Pin = UI_Sw_Pin|S2_Ready_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -1227,10 +1226,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED5_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : BTN_A_Pin BTN_B_Pin S4_EncZ_Pin S4_Treach_Pin
-                           S3_Ready_Pin */
-  GPIO_InitStruct.Pin = BTN_A_Pin|BTN_B_Pin|S4_EncZ_Pin|S4_Treach_Pin
-                          |S3_Ready_Pin;
+  /*Configure GPIO pins : BTN_A_Pin BTN_B_Pin S4_EncZ_Pin S3_Ready_Pin */
+  GPIO_InitStruct.Pin = BTN_A_Pin|BTN_B_Pin|S4_EncZ_Pin|S3_Ready_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -1250,6 +1247,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : S4_Treach_Pin */
+  GPIO_InitStruct.Pin = S4_Treach_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(S4_Treach_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pins : S3_Enable_Pin S3_Direction_Pin S2_Enable_Pin S1_Direction_Pin
                            S1_Enable_Pin */
   GPIO_InitStruct.Pin = S3_Enable_Pin|S3_Direction_Pin|S2_Enable_Pin|S1_Direction_Pin
@@ -1259,13 +1262,23 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : S3_Treach_Pin S3_EncZ_Pin S1_EncZ_Pin S1_Treach_Pin
-                           S1_Ready_Pin */
-  GPIO_InitStruct.Pin = S3_Treach_Pin|S3_EncZ_Pin|S1_EncZ_Pin|S1_Treach_Pin
-                          |S1_Ready_Pin;
+  /*Configure GPIO pins : S3_Treach_Pin S1_Treach_Pin */
+  GPIO_InitStruct.Pin = S3_Treach_Pin|S1_Treach_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : S3_EncZ_Pin S1_EncZ_Pin S1_Ready_Pin */
+  GPIO_InitStruct.Pin = S3_EncZ_Pin|S1_EncZ_Pin|S1_Ready_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : S2_Treach_Pin */
+  GPIO_InitStruct.Pin = S2_Treach_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(S2_Treach_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : S2_EncZ_Pin */
   GPIO_InitStruct.Pin = S2_EncZ_Pin;

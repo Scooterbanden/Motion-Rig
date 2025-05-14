@@ -17,7 +17,7 @@ int32_t stepTestTime = 5000;
 int32_t seqTestTime = 200000;
 
 int valDir = 1;
-int valSpeed = 50;
+int valSpeed = 150;
 
 float freqScale;
 float rpmAmplitude;
@@ -98,7 +98,7 @@ void controlLoop(void) {
 		for (int i = 0; i < 4; i++) {
 			if ((servo[i].enableFlag) && !(servo[i].TreachFlag)) {
 				running++;
-				setMotorSpeed(-50,&servo[i]);
+				setMotorSpeed(-100,&servo[i]);
 			}
 		}
 		if (running == 0) {
@@ -106,6 +106,8 @@ void controlLoop(void) {
 				if (servo[i].enableFlag) {
 					__HAL_TIM_SET_COUNTER(servo[i].encoder.encoder,0);
 					servo[i].encoder.position = 0;
+					__HAL_TIM_SET_COUNTER(servo[i].counter.timer,0);
+					servo[i].counter.count = 0;
 				}
 			}
 			controlMode = PARK;
@@ -115,13 +117,13 @@ void controlLoop(void) {
 		int parking = 0;
 		for (int i = 0; i < 4; i++) {
 			if (servo[i].enableFlag) {
-				if (get_servo_position(&servo[i]) >= STROKE_T/2*MM2PULSE) {
+				if (get_servo_position(&servo[i]) >= (int32_t)STROKE_T/2*MM2PULSE) {
 					servo[i].ParkedFlag = 1;
 					setMotorSpeed(0,&servo[i]);
 				}
 				if (!(servo[i].ParkedFlag)) {
 					parking++;
-					setMotorSpeed(50,&servo[i]);
+					setMotorSpeed(100,&servo[i]);
 				}
 			}
 		}
@@ -138,13 +140,13 @@ void controlLoop(void) {
 			if (servo[i].enableFlag) {
 				switch (valDir) {
 				case 1:
-					if (get_servo_position(&servo[i]) >= (uint16_t)(STROKE_T*0.8*MM2PULSE)) {
+					if (get_servo_position(&servo[i]) >= (int32_t)(STROKE_T*0.8*MM2PULSE)) {
 						servo[i].ParkedFlag = 1;
 						setMotorSpeed(0,&servo[i]);
 					}
 					break;
 				case -1:
-					if (get_servo_position(&servo[i]) <= (uint16_t)(STROKE_T*0.2*MM2PULSE)) {
+					if (get_servo_position(&servo[i]) <= (int32_t)(STROKE_T*0.2*MM2PULSE)) {
 						servo[i].ParkedFlag = 1;
 						setMotorSpeed(0,&servo[i]);
 					}
@@ -152,7 +154,7 @@ void controlLoop(void) {
 				}
 				if (!(servo[i].ParkedFlag)) {
 					going++;
-					setMotorSpeed(50*valDir,&servo[i]);
+					setMotorSpeed(valSpeed*valDir,&servo[i]);
 				}
 			}
 		}
@@ -168,15 +170,25 @@ void controlLoop(void) {
 					servo[i].ParkedFlag = 0;
 				}
 				valSpeed = valSpeed*2;
-				if (valSpeed < 500) {
+				if (valSpeed > 500) {
 					controlMode = IDLE;
+					for (int i = 0; i < 4; i++) {
+						setGPIO(servo[i].enablePin, GPIO_PIN_RESET);
+						servo[i].enableFlag = 0;
+					}
 				}
 			}
 		}
-		for (int i = 0; i < 3; i++) {
-			servoEnc = get_servo_position(&servo[i]);
-			servoCount = get_sent_pulses(&pulseCounters[i]);
-			send_int32_uart(servoCount*20,servoEnc);
+		for (int i = 0; i < 4; i++) {
+			if (servo[i].enableFlag) {
+				if (i != 2) {
+					servoCount = get_sent_pulses(&servo[i].counter);
+				} else {
+					servoCount = servo[i].counter.count;
+				}
+				servoEnc = get_servo_position(&servo[i]);
+				send_int32_uart(servoCount*20,servoEnc);
+			}
 		}
 
 		break;
@@ -196,9 +208,9 @@ void setMotorSpeed(int16_t rpm, servo_t* servo) {
 	if (rpm < 0) {
 		direction = GPIO_PIN_SET;
 		rpm = abs(rpm);
-		htim4.Instance->CR1 |=  TIM_CR1_DIR;
+		servo->counter.timer->Instance->CR1 |=  TIM_CR1_DIR;
 	} else {
-		htim4.Instance->CR1 &= ~TIM_CR1_DIR;
+		servo->counter.timer->Instance->CR1 &= ~TIM_CR1_DIR;
 	}
 	if (rpm > 3000) { rpm = 3000; }
 	if (rpm < 50) { rpm = 50; }

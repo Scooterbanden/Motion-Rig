@@ -17,6 +17,7 @@
 // Forward declaration
 struct servo_t;
 struct encoder_t;
+struct pulseCounter_t;
 
 struct encoder_t {
 	TIM_HandleTypeDef* encoder;
@@ -26,6 +27,13 @@ struct encoder_t {
 };
 
 typedef struct encoder_t encoder_t;
+
+struct pulseCounter_t {
+	TIM_HandleTypeDef* timer;
+	uint32_t count;
+};
+
+typedef struct pulseCounter_t pulseCounter_t;
 
 // Define the struct (No `typedef` here)
 struct servo_t {
@@ -43,6 +51,7 @@ struct servo_t {
 	uint32_t TIM_CH_HR;
 	encoder_t encoder;
 	uint8_t ParkedFlag;
+	pulseCounter_t counter;
 };
 
 
@@ -59,7 +68,7 @@ extern servo_t servo[];
 void UpdateReady(servo_t* s);
 void UpdateTreach(servo_t* s);
 void UpdateEncZ(servo_t* s);
-int32_t get_sent_pulses(encoder_t* e);
+int32_t get_sent_pulses(pulseCounter_t* c);
 int32_t get_servo_position(servo_t* s);
 void servoInit(void);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);

@@ -21,16 +21,18 @@ struct pulseCounter_t;
 
 struct encoder_t {
 	TIM_HandleTypeDef* encoder;
-	uint32_t position;
+	int32_t position;
 	GPIO_t encZpin;
 	uint32_t lastZ;
+	int32_t last_count;
 };
 
 typedef struct encoder_t encoder_t;
 
 struct pulseCounter_t {
 	TIM_HandleTypeDef* timer;
-	uint32_t count;
+	int32_t count;
+	int32_t last_count;
 };
 
 typedef struct pulseCounter_t pulseCounter_t;

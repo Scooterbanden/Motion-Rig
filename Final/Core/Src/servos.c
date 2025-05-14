@@ -22,10 +22,10 @@
 
 // Struct instances
 servo_t servo[] = {
-    {0, {GPIOD, S1_Ready_Pin}, 0, {GPIOD, S1_Treach_Pin}, 0, {GPIOD, S1_Enable_Pin}, 0, {GPIOD, S1_Direction_Pin}, 0, &htim8, TIM_CHANNEL_4, HRTIM_TIMERINDEX_TIMER_C, {&htim3, 0, {GPIOD, S1_EncZ_Pin}, 0}, 0, {&htim5, 0}},
-	{0, {GPIOA, S2_Ready_Pin}, 0, {GPIOA, S2_Treach_Pin}, 0, {GPIOD, S2_Enable_Pin}, 0, {GPIOC, S2_Direction_Pin}, 0, &htim15, TIM_CHANNEL_2, HRTIM_TIMERINDEX_TIMER_B, {&htim2, 0, {GPIOC, S2_EncZ_Pin}, 0}, 0, {&htim1, 0}},
-	{0, {GPIOB, S3_Ready_Pin}, 0, {GPIOD, S3_Treach_Pin}, 0, {GPIOD, S3_Enable_Pin}, 0, {GPIOD, S3_Direction_Pin}, 0, &htim14, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_A, {&htim4, 0, {GPIOD, S3_EncZ_Pin}, 0}, 0, {&htim12, 0}},
-	{0, {GPIOE, S4_Ready_Pin}, 0, {GPIOB, S4_Treach_Pin}, 0, {GPIOE, S4_Enable_Pin}, 0, {GPIOE, S4_Direction_Pin}, 0, &htim13, TIM_CHANNEL_1, 0, {&htim1, 0, {GPIOB, S4_EncZ_Pin}, 0}, 0}
+    {0, {GPIOD, S1_Ready_Pin}, 0, {GPIOD, S1_Treach_Pin}, 0, {GPIOD, S1_Enable_Pin}, 0, {GPIOD, S1_Direction_Pin}, 0, &htim8, TIM_CHANNEL_4, HRTIM_TIMERINDEX_TIMER_C, {&htim3, 0, {GPIOD, S1_EncZ_Pin}, 0, 0}, 0, {&htim5, 0, 0}},
+	{0, {GPIOA, S2_Ready_Pin}, 0, {GPIOA, S2_Treach_Pin}, 0, {GPIOD, S2_Enable_Pin}, 0, {GPIOC, S2_Direction_Pin}, 0, &htim15, TIM_CHANNEL_2, HRTIM_TIMERINDEX_TIMER_B, {&htim2, 0, {GPIOC, S2_EncZ_Pin}, 0, 0}, 0, {&htim1, 0, 0}},
+	{0, {GPIOB, S3_Ready_Pin}, 0, {GPIOD, S3_Treach_Pin}, 0, {GPIOD, S3_Enable_Pin}, 0, {GPIOD, S3_Direction_Pin}, 0, &htim14, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_A, {&htim4, 0, {GPIOD, S3_EncZ_Pin}, 0, 0}, 0, {&htim12, 0, 0}},
+	{0, {GPIOE, S4_Ready_Pin}, 0, {GPIOB, S4_Treach_Pin}, 0, {GPIOE, S4_Enable_Pin}, 0, {GPIOE, S4_Direction_Pin}, 0, &htim13, TIM_CHANNEL_1, 0, {&htim1, 0, {GPIOB, S4_EncZ_Pin}, 0, 0}, 0}
 };
 
 void ReadyFunc(servo_t* s) {
@@ -68,19 +68,23 @@ void servoInit(void) {
 
 int32_t get_servo_position(servo_t* s)
 {
-	// Race condition resistant position reading
     int32_t pos1, pos2;
-    uint16_t cnt1;
+    uint16_t cnt1, cnt2;
+    uint32_t dir1, dir2;
 
-    do
-    {
+    do {
         pos1 = s->encoder.position;
         cnt1 = __HAL_TIM_GET_COUNTER(s->encoder.encoder);
+        dir1 = READ_BIT(s->encoder.encoder->Instance->CR1, TIM_CR1_DIR);
         pos2 = s->encoder.position;
-    } while (pos1 != pos2);
+        cnt2 = __HAL_TIM_GET_COUNTER(s->encoder.encoder);
+        dir2 = READ_BIT(s->encoder.encoder->Instance->CR1, TIM_CR1_DIR);
+    } while (pos1 != pos2 || cnt1 != cnt2 || dir1 != dir2);
 
     return pos1 + cnt1;
 }
+
+
 
 int32_t get_sent_pulses(pulseCounter_t* c)
 {

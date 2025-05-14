@@ -35,6 +35,37 @@ void controlInit(void) {
 void controlLoop(void) {
 	int32_t servoEnc;
 	int32_t servoCount;
+	for (int i = 0; i < 4; i++) {
+		if (servo[i].enableFlag) {
+			int32_t curr = (int32_t)__HAL_TIM_GET_COUNTER(servo[i].encoder.encoder);  // Get current counter value
+			int32_t delta = (curr - servo[i].encoder.last_count);     // Calculate delta
+
+			// Handle wraparound (up/down counting)
+			if (delta > 32767) {  // Overflow detected (the counter reset to 0)
+			    delta -= 65536;  // Correct the overflow
+			} else if (delta < -32768) {  // Underflow detected (the counter reset from 0)
+			    delta += 65536;  // Correct the underflow
+			}
+
+			servo[i].encoder.position += delta;  // Update position with delta
+			servo[i].encoder.last_count = curr;  // Store current count for next iteration
+
+			if (i != 2) {
+				curr = (int32_t)__HAL_TIM_GET_COUNTER(servo[i].counter.timer);
+				delta = (curr - servo[i].counter.last_count);
+
+				// Handle wraparound (up/down counting)
+				if (delta > 32767) {  // Overflow detected (the counter reset to 0)
+					delta -= 65536;  // Correct the overflow
+				} else if (delta < -32768) {  // Underflow detected (the counter reset from 0)
+					delta += 65536;  // Correct the underflow
+				}
+
+				servo[i].counter.count += delta;  // Update position with delta
+				servo[i].counter.last_count = curr;  // Store current count for next iteration
+			}
+		}
+	}
 	switch (controlMode) {
 	case IDLE:
 		break;
@@ -106,8 +137,10 @@ void controlLoop(void) {
 				if (servo[i].enableFlag) {
 					__HAL_TIM_SET_COUNTER(servo[i].encoder.encoder,0);
 					servo[i].encoder.position = 0;
+					servo[i].encoder.last_count = 0;
 					__HAL_TIM_SET_COUNTER(servo[i].counter.timer,0);
 					servo[i].counter.count = 0;
+					servo[i].counter.last_count = 0;
 				}
 			}
 			controlMode = PARK;
@@ -170,7 +203,8 @@ void controlLoop(void) {
 					servo[i].ParkedFlag = 0;
 				}
 				valSpeed = valSpeed*2;
-				if (valSpeed > 500) {
+				if (valSpeed > 1300) {
+					valSpeed = 0;
 					controlMode = IDLE;
 					for (int i = 0; i < 4; i++) {
 						setGPIO(servo[i].enablePin, GPIO_PIN_RESET);
@@ -181,15 +215,13 @@ void controlLoop(void) {
 		}
 		for (int i = 0; i < 4; i++) {
 			if (servo[i].enableFlag) {
-				if (i != 2) {
-					servoCount = get_sent_pulses(&servo[i].counter);
-				} else {
-					servoCount = servo[i].counter.count;
-				}
-				servoEnc = get_servo_position(&servo[i]);
-				send_int32_uart(servoCount*20,servoEnc);
+			    servoCount = servo[i].counter.count;
+				servoEnc = servo[i].encoder.position;
+				send_int32_uart(servoCount*20, servoEnc);
+				//add2Buffer(servoCount*20, servoEnc);
 			}
 		}
+		sendUART();
 
 		break;
 	}

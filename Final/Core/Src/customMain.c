@@ -53,10 +53,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {		// Main screen ge
         	CountUpdate(&servo[1].counter);
             break;
         case (uintptr_t)TIM2:
-			EncUpdate(&servo[1].encoder);
+			//EncUpdate(&servo[1].encoder);
             break;
         case (uintptr_t)TIM3:
-        	EncUpdate(&servo[0].encoder);
+        	//EncUpdate(&servo[0].encoder);
             break;
         case (uintptr_t)TIM4:
 			if (controlMode == REALIGN) {
@@ -69,7 +69,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {		// Main screen ge
 			}
             break;
         case (uintptr_t)TIM5:
-        	CountUpdate(&servo[0].counter);
+        	//7CountUpdate(&servo[0].counter);
         case (uintptr_t)TIM12:
         	//servo[2].counter.count++;
         	break;

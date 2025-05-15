@@ -50,23 +50,10 @@ Menu SpeedMenu = {
 	&SpeedHelp
 };
 
-
-MenuItem ManualMenuItems[] = {
-	{"Speed", enterMenu, &SpeedMenu},
-	{"Step", enterMenu, &StepMenu}
-};
-Menu ManualMenu = {
-	ManualMenuItems,
-	sizeof(ManualMenuItems) / sizeof(ManualMenuItems[0]),
-	Idle,
-	&MainMenu,
-	&ManualHelp
-};
-
 MenuItem SequencesMenuItems[] = {
-		{"sin1", startSeq1, NULL},
-		{"sin2", startSeq2, NULL},
-		{"sin3", startSeq3, NULL}
+		{"Chirp1", startSeq1, NULL},
+		{"Chirp2", startSeq2, NULL},
+		{"Chirp3", startSeq3, NULL}
 };
 
 Menu SequencesMenu = {
@@ -77,9 +64,25 @@ Menu SequencesMenu = {
 	NULL
 };
 
+MenuItem ManualMenuItems[] = {
+	{"Speed", enterMenu, &SpeedMenu},
+	{"Step", enterMenu, &StepMenu},
+	{"Sequences", enterMenu, &SequencesMenu}
+};
+
+Menu ManualMenu = {
+	ManualMenuItems,
+	sizeof(ManualMenuItems) / sizeof(ManualMenuItems[0]),
+	Idle,
+	&MainMenu,
+	&ManualHelp
+};
+
+
 MenuItem AutomaticMenuItems[] = {
-	{"Sequences", enterMenu, &SequencesMenu},
-	{"Motion", NULL, NULL}
+	{"Validation", startValidation, NULL},
+	{"Motion", NULL, NULL},
+	{"Calibrate", startCalibration, NULL}
 };
 Menu AutomaticMenu = {
 	AutomaticMenuItems,
@@ -92,8 +95,7 @@ Menu AutomaticMenu = {
 
 MenuItem MainMenuItems[] = {
 	{"Manual", enterMenu, &ManualMenu},
-	{"Automatic", enterMenu, &AutomaticMenu},
-	{"Calibrate", startCalibration, NULL}
+	{"Automatic", enterMenu, &AutomaticMenu}
 };
 Menu MainMenu = {
 	MainMenuItems,
@@ -119,11 +121,48 @@ MenuState menuState = {
 	0
 };
 
+void startValidation(void) {
+	controlCounter = 0;
+	validationMode = INDIVIDUAL_CONSTANT;
+	controlMode = VALIDATION;
+}
+
 void startCalibration(void) {
-	servoInit();
-	controlInit();
+	calibrated = false;
 	controlCounter = 0;
 	controlMode = CALIBRATE;
+}
+
+
+
+void setRPM(void) {
+	int32_t rpm = __HAL_TIM_GET_COUNTER(&htim5);
+	for (int i = 0; i < 4; i++) {
+		if (servo[i].enableFlag) {
+			setMotorSpeed(rpm*ENCRPMGAIN, &servo[i]);
+		}
+	}
+}
+
+void enterMenu(void) {
+	menuState.current_menu = menuState.current_menu->items[menuState.selected_index].submenu;
+	menuState.selected_index = 0;
+	encoderValue = 0;
+	__HAL_TIM_SET_COUNTER(&htim5, 0);
+
+	switch (menuState.current_menu->type) {
+	case Idle:
+		servoInit();
+		controlInit();
+		break;
+	case Motion:
+	case Action:
+		//controlInit();
+		break;
+	default:
+		break;
+	}
+
 }
 
 void setStepFlag(void) {
@@ -154,33 +193,4 @@ void startSeq3(void) {
 void setSeqFlag(void) {
 	controlCounter = 0;
 	controlMode = SEQUENCE;
-}
-
-void setRPM(void) {
-	int32_t rpm = __HAL_TIM_GET_COUNTER(&htim5);
-	for (int i = 0; i < 4; i++) {
-		if (servo[i].enableFlag) {
-			setMotorSpeed(rpm*ENCRPMGAIN, &servo[i]);
-		}
-	}
-}
-
-void enterMenu(void) {
-	menuState.current_menu = menuState.current_menu->items[menuState.selected_index].submenu;
-	menuState.selected_index = 0;
-	encoderValue = 0;
-	__HAL_TIM_SET_COUNTER(&htim5, 0);
-
-	switch (menuState.current_menu->type) {
-	case Idle:
-		servoInit();
-		break;
-	case Motion:
-	case Action:
-		controlInit();
-		break;
-	default:
-		break;
-	}
-
 }

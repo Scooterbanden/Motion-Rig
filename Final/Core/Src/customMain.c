@@ -49,8 +49,9 @@ void CountUpdate(pulseCounter_t* c) {
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {		// Main screen generate frame
     switch ((uintptr_t)htim->Instance) {  // Cast the timer instance to uintptr_t for comparison
-        case (uintptr_t)TIM1:
-        	CountUpdate(&servo[1].counter);
+        /*
+    	case (uintptr_t)TIM1:
+        	//CountUpdate(&servo[1].counter);
             break;
         case (uintptr_t)TIM2:
 			//EncUpdate(&servo[1].encoder);
@@ -65,20 +66,23 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {		// Main screen ge
 				//__HAL_TIM_SET_COUNTER(&htim4,0);
 				__HAL_TIM_SET_AUTORELOAD(&htim4, 65535);
 			} else {
-				EncUpdate(&servo[2].encoder);
+				//EncUpdate(&servo[2].encoder);
 			}
             break;
         case (uintptr_t)TIM5:
-        	//7CountUpdate(&servo[0].counter);
+        	//CountUpdate(&servo[0].counter);
+        	break;
         case (uintptr_t)TIM12:
         	//servo[2].counter.count++;
         	break;
-        case (uintptr_t)TIM15:
+        */
+        case (uintptr_t)TIM14:
 			if (getGPIO(servo[2].directionPin) == GPIO_PIN_SET) {
 				servo[2].counter.count--;
 			} else {
 				servo[2].counter.count++;
 			}
+        	break;
         case (uintptr_t)TIM17:
         	controlLoop();
             break;
@@ -102,6 +106,7 @@ void userLoop(void) {														// Lowest priority code, handles updating ole
 			ledDir = -ledDir;
 			ledIdx = ledIdx + ledDir;
 		}
+		int32_t servoEnc = servo[0].encoder.position;
 		HAL_Delay(200);
 	}
 }

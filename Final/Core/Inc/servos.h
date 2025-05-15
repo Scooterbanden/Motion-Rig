@@ -39,20 +39,19 @@ typedef struct pulseCounter_t pulseCounter_t;
 
 // Define the struct (No `typedef` here)
 struct servo_t {
-	uint8_t readyFlag;
+	bool readyFlag;
 	GPIO_t readyPin;
-	uint8_t TreachFlag;
+	bool TreachFlag;
 	GPIO_t TreachPin;
-	uint8_t enableFlag;
+	bool enableFlag;
 	GPIO_t enablePin;
-	uint8_t directionFlag;
 	GPIO_t directionPin;
 	uint8_t TIM_sourceFlag;
 	TIM_HandleTypeDef* pulseTimerGP;
 	uint32_t TIM_CH_GP;
 	uint32_t TIM_CH_HR;
 	encoder_t encoder;
-	uint8_t ParkedFlag;
+	bool ParkedFlag;
 	pulseCounter_t counter;
 };
 
@@ -63,6 +62,8 @@ struct servo_t {
 typedef struct servo_t servo_t;
 
 // External reference to the struct array
+extern int activeServos;
+extern int currentServo;
 extern encoder_t pulseCounters[];
 extern servo_t servo[];
 

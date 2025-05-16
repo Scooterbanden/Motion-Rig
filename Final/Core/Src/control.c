@@ -142,9 +142,14 @@ void controlLoop(void) {
 	case CALIBRATE:
 		int running = 0;
 		for (int i = 0; i < 4; i++) {
-			if ((servo[i].enableFlag) && !(servo[i].TreachFlag)) {
-				running++;
-				setMotorSpeed(-CALIBRATIONSPEED,&servo[i]);
+			if (servo[i].enableFlag) {
+				if (!(servo[i].TreachFlag)) {
+					running++;
+					setMotorSpeed(-CALIBRATIONSPEED,&servo[i]);
+				} else {
+					setMotorSpeed(0,&servo[i]);
+				}
+
 			}
 		}
 		if (running == 0) {

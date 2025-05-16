@@ -28,7 +28,7 @@ servo_t servo[] = {
     {false, {GPIOD, S1_Ready_Pin}, false, {GPIOD, S1_Treach_Pin}, false, {GPIOD, S1_Enable_Pin}, {GPIOD, S1_Direction_Pin}, 0, &htim8, TIM_CHANNEL_4, HRTIM_TIMERINDEX_TIMER_C, {&htim3, 0, {GPIOD, S1_EncZ_Pin}, 0, 0}, false, {&htim5, 0, 0}},
 	{false, {GPIOA, S2_Ready_Pin}, false, {GPIOA, S2_Treach_Pin}, false, {GPIOD, S2_Enable_Pin}, {GPIOC, S2_Direction_Pin}, 0, &htim15, TIM_CHANNEL_2, HRTIM_TIMERINDEX_TIMER_B, {&htim2, 0, {GPIOC, S2_EncZ_Pin}, 0, 0}, false, {&htim1, 0, 0}},
 	{false, {GPIOB, S3_Ready_Pin}, false, {GPIOD, S3_Treach_Pin}, false, {GPIOD, S3_Enable_Pin}, {GPIOD, S3_Direction_Pin}, 0, &htim14, TIM_CHANNEL_1, HRTIM_TIMERINDEX_TIMER_A, {&htim4, 0, {GPIOD, S3_EncZ_Pin}, 0, 0}, false, {NULL, 0, 0}},
-	{false, {GPIOE, S4_Ready_Pin}, false, {GPIOB, S4_Treach_Pin}, false, {GPIOE, S4_Enable_Pin}, {GPIOE, S4_Direction_Pin}, 0, &htim13, TIM_CHANNEL_1, NULL, {&htim1, 0, {GPIOB, S4_EncZ_Pin}, 0, 0}, false, NULL}
+	{false, {GPIOE, S4_Ready_Pin}, false, {GPIOB, S4_Treach_Pin}, false, {GPIOE, S4_Enable_Pin}, {GPIOE, S4_Direction_Pin}, 0, &htim13, TIM_CHANNEL_1, NULL, {&htim1, 0, {GPIOB, S4_EncZ_Pin}, 0, 0}, false, {NULL, 0, 0}}
 };
 
 void ReadyFunc(servo_t* s) {
@@ -37,7 +37,7 @@ void ReadyFunc(servo_t* s) {
 
 void TreachFunc(servo_t* s) {
 	s->TreachFlag = true;
-	HAL_TIM_OC_Stop(s->pulseTimerGP, s->TIM_CH_GP);
+	//HAL_TIM_OC_Stop(s->pulseTimerGP, s->TIM_CH_GP);
 	//HAL_GPIO_TogglePin(LEDs[8].port, LEDs[8].pin);
 }
 

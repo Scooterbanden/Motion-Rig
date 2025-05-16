@@ -23,14 +23,40 @@ uint8_t* sendBuf  = TxBufB;
 int writeIdx = 0;
 volatile bool uart_busy = false;
 
+void sendValData(uint32_t loopIteration) {
+	uint8_t buffer[32];
+	uint32_t servoCount;
+	uint32_t servoEnc;
 
-void add2Buffer(int32_t count, int32_t encoder) {
-	if (writeIdx + 8 <= sizeof(TxBufA)) {
-	    for (int i = 0; i < 4; i++) {
-	        writeBuf[writeIdx + i] = (uint8_t)((count >> (i*8)) & 0xFF);
-	        writeBuf[writeIdx + 4 + i] = (uint8_t)((encoder >> (i*8)) & 0xFF);
-	    }
-	    writeIdx += 8;
+    buffer[0] = (uint8_t)(loopIteration & 0xFF);
+    buffer[1] = (uint8_t)((loopIteration >> 8) & 0xFF);
+    buffer[2] = (uint8_t)((loopIteration >> 16) & 0xFF);
+    buffer[3] = (uint8_t)((loopIteration >> 24) & 0xFF);
+
+    uint8_t bufIdx = 4;
+	for (int i = 0; i < 4; i++) {
+		if (servo[i].enableFlag) {
+			if (i == 2) {
+				servoCount = servo[i].counter.count*10;
+			} else {
+				servoCount = servo[i].counter.count*20;
+			}
+			servoEnc = servo[i].encoder.position;
+			for (int j = 0; j < 4; j++) {
+				buffer[bufIdx + j] = (uint8_t)((servoCount >> (j*8)) & 0xFF);
+				buffer[bufIdx + 4 + j] = (uint8_t)((servoEnc >> (j*8)) & 0xFF);
+			}
+			bufIdx += 8;
+		}
+	}
+	HAL_UART_Transmit(&huart2, buffer, bufIdx, HAL_MAX_DELAY);
+}
+
+/*
+void add2Buffer(uint8_t bufIdx, int32_t count, int32_t encoder) {
+	for (int i = 0; i < 4; i++) {
+		writeBuf[writeIdx + i] = (uint8_t)((count >> (i*8)) & 0xFF);
+		writeBuf[writeIdx + 4 + i] = (uint8_t)((encoder >> (i*8)) & 0xFF);
 	}
 }
 
@@ -39,7 +65,7 @@ void sendUART(void) {
     if (!uart_busy && writeIdx > 0) {
         uart_busy = true;
 
-        // Swap buffers
+         Swap buffers
         uint8_t* temp = sendBuf;
         sendBuf = writeBuf;
         writeBuf = temp;
@@ -50,7 +76,7 @@ void sendUART(void) {
         HAL_UART_Transmit_DMA(&huart2, sendBuf, len);
     }
 }
-
+*/
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {

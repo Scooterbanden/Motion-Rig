@@ -28,6 +28,7 @@ float freqInitial = 0.001;
 
 bool calibrated = false;
 uint32_t controlCounter = 0;
+uint32_t loopIteration = 0;
 ControlMode controlMode = IDLE;
 ValidationMode validationMode;
 ControlMode requestedMode;		// To allow CALIBRATE to return to the mode that started it
@@ -192,6 +193,7 @@ void controlLoop(void) {
 		}
 		if (parking == 0) {
 			controlMode = requestedMode;
+			loopIteration = 0;
 			for (int i = 0; i < 4; i++) {
 				servo[i].ParkedFlag = false;
 			}
@@ -336,53 +338,9 @@ void controlLoop(void) {
 			}
 			break;
 		}
+		loopIteration++;
+		sendValData(loopIteration);
 		/*
-		float rpmSP = ((float)(valSpeed*valDir));
-
-		for (int i = 0; i < 4; i++) {
-			if (servo[i].enableFlag) {
-
-				bool isForwardLimitReached = (valDir == 1) && (servo[i].encoder.position >= UPPERLIMIT);
-				bool isReverseLimitReached = (valDir == -1) && (servo[i].encoder.position <= LOWERLIMIT);
-
-				int32_t estimatedPosition = servo[i].encoder.position + (int32_t)(rpmSP*RPM2FREQ*TCONTROL);
-				bool willReachForwardLimit = (valDir == 1) && (estimatedPosition >= UPPERLIMIT);
-				bool willReachReverseLimit = (valDir == -1) && (estimatedPosition <= LOWERLIMIT);
-				if (willReachForwardLimit || willReachReverseLimit || isForwardLimitReached || isReverseLimitReached) {
-					servo[i].ParkedFlag = 1;
-					setMotorSpeed(0, &servo[i]);
-				}
-
-				if (!(servo[i].ParkedFlag)) {
-					going++;
-					setMotorSpeed(valSpeed*valDir,&servo[i]);
-
-				}
-			}
-		}
-		if (going == 0) {
-			if (valDir == 1) {
-				valDir = -1;
-				for (int i = 0; i < 4; i++) {
-					servo[i].ParkedFlag = 0;
-				}
-			} else {
-				valDir = 1;
-				for (int i = 0; i < 4; i++) {
-					servo[i].ParkedFlag = 0;
-				}
-				valSpeed = valSpeed*2;
-				if (valSpeed > 2500) {
-					valSpeed = 0;
-					controlMode = IDLE;
-					for (int i = 0; i < 4; i++) {
-						setMotorSpeed(0,&servo[i]);
-						setGPIO(servo[i].enablePin, GPIO_PIN_RESET);
-						servo[i].enableFlag = 0;
-					}
-				}
-			}
-		}*/
 		for (int i = 0; i < 4; i++) {
 			if (servo[i].enableFlag) {
 			    servoCount = servo[i].counter.count;
@@ -396,7 +354,7 @@ void controlLoop(void) {
 			}
 		}
 		//sendUART();
-
+		*/
 		break;
 	}
 }

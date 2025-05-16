@@ -142,14 +142,9 @@ void controlLoop(void) {
 	case CALIBRATE:
 		int running = 0;
 		for (int i = 0; i < 4; i++) {
-			if (servo[i].enableFlag) {
-				if (!(servo[i].TreachFlag)) {
-					running++;
-					setMotorSpeed(-CALIBRATIONSPEED,&servo[i]);
-				} else {
-					setMotorSpeed(0,&servo[i]);
-				}
-
+			if ((servo[i].enableFlag) && !(servo[i].TreachFlag)) {
+				running++;
+				setMotorSpeed(-CALIBRATIONSPEED,&servo[i]);
 			}
 		}
 		if (running == 0) {
@@ -216,7 +211,6 @@ void controlLoop(void) {
 			} else {
 				servo[currentServo].ParkedFlag = false;
 				if (!nextSpeed()) {
-					setMotorSpeed(0, &servo[currentServo]);
 					int prevServo = currentServo;
 					for (int i = currentServo+1; i < 4; i++) {
 						if (servo[i].enableFlag) {
@@ -226,7 +220,6 @@ void controlLoop(void) {
 					}
 					if (currentServo == prevServo) {
 						controlCounter = 0;
-						currentServo = 0;
 						speedChanges = 0;
 						validationMode = INDIVIDUAL_VARYING;
 					}
@@ -246,7 +239,6 @@ void controlLoop(void) {
 				controlCounter = 0;
 				servo[currentServo].ParkedFlag = false;
 				if (!nextSpeed()) {
-					setMotorSpeed(0, &servo[currentServo]);
 					int prevServo = currentServo;
 					for (int i = currentServo+1; i < 4; i++) {
 						if (servo[i].enableFlag) {

@@ -17,7 +17,7 @@ int32_t stepTestTime = 5000;
 int32_t seqTestTime = 200000;
 
 int valDir = 1;
-int valSpeed = 150;
+int valSpeed = 200;
 double speedChanges = 0;	// For speedShaping parameter calculation mu and sigma
 double mu = 1;
 double sigma = 3;
@@ -82,6 +82,36 @@ void controlLoop(void) {
 			controlMode = CALIBRATE;
 			break;
 		}
+		uint8_t refIdx = 0;
+		for (int i = 0; i < 4; i++) {
+			if (servo[i].enableFlag) {
+				int32_t error = posRefs[refIdx] - servo[i].encoder.position;
+				float temp = (float)error * 0.08f;
+
+				if (temp > INT16_MAX) temp = INT16_MAX;
+				else if (temp < INT16_MIN) temp = INT16_MIN;
+
+				int16_t rpm = (int16_t)temp;
+				if (i == 0) {
+					setMotorSpeed(rpm, &servo[i]);
+				}
+				refIdx++;
+			}
+		}
+		controlCounter++;
+		if (commsFlag) {
+			controlCounter = 0;
+			commsFlag = false;
+		}
+		if (controlCounter > 100) {
+			posRefs[0] = 0;
+			posRefs[1] = 0;
+			posRefs[2] = 0;
+		}
+		loopIteration++;
+		//sendPosData(loopIteration);
+
+
 
 		break;
 	case SEQUENCE:
@@ -194,6 +224,18 @@ void controlLoop(void) {
 		if (parking == 0) {
 			controlMode = requestedMode;
 			loopIteration = 0;
+			for (int i = 0; i < 4; i++) {
+				if (servo[i].enableFlag) {
+					__HAL_TIM_SET_COUNTER(servo[i].encoder.encoder,0);
+					servo[i].encoder.position = 0;
+					servo[i].encoder.last_count = 0;
+					if (servo[i].counter.timer != NULL) {
+						__HAL_TIM_SET_COUNTER(servo[i].counter.timer,0);
+					}
+					servo[i].counter.count = 0;
+					servo[i].counter.last_count = 0;
+				}
+			}
 			for (int i = 0; i < 4; i++) {
 				servo[i].ParkedFlag = false;
 			}
@@ -385,8 +427,10 @@ bool nextSpeed(void) {
 		}
 		valSpeed = valSpeed*2;
 		speedChanges++;
-		if (valSpeed > 2500) {
-			valSpeed = 150;
+		if (valSpeed == 3200) {
+			valSpeed = 3000;
+		} else if (valSpeed > 3000) {
+			valSpeed = 200;
 			keepGoing = false;
 		}
 	}
@@ -424,14 +468,20 @@ void setMotorSpeed(int16_t rpm, servo_t* servo) {
 		}
 	}
 	if (rpm > 3000) { rpm = 3000; }
-	if (rpm < 50) {
+	if (rpm < 30) {
 		/*
 		if (controlMode == VALIDATION) {
 			servo->ParkedFlag = true;
 		}*/
-		rpm = 50;
+		rpm = 0;
+		HAL_TIM_OC_Stop(servo->pulseTimerGP, servo->TIM_CH_GP);
+		return;
 	}
-
+	int16_t delta = rpm - (servo->prevRpm);
+	if (abs(delta) > MAX_DELTA) {
+	    rpm = servo->prevRpm + MAX_DELTA * delta/abs(delta);
+	}
+	servo->prevRpm = rpm;
 	freqTarget = rpm*RPM2FREQ;
 	ARR = CLOCKFREQ/freqTarget;
 	if (ARR > 65535) {			// Max ARR (min speed)

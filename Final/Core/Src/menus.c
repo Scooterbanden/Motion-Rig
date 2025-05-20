@@ -81,7 +81,7 @@ Menu ManualMenu = {
 
 MenuItem AutomaticMenuItems[] = {
 	{"Validation", startValidation, NULL},
-	{"Motion", NULL, NULL},
+	{"Game", startGame, NULL},
 	{"Calibrate", startCalibration, NULL}
 };
 Menu AutomaticMenu = {
@@ -121,9 +121,14 @@ MenuState menuState = {
 	0
 };
 
+void startGame(void) {
+	controlCounter = 0;
+	controlMode = GAME;
+}
+
 void startValidation(void) {
 	controlCounter = 0;
-	validationMode = INDIVIDUAL_CONSTANT;
+	validationMode = ALL_CONSTANT;
 	controlMode = VALIDATION;
 }
 
@@ -157,7 +162,8 @@ void enterMenu(void) {
 		break;
 	case Motion:
 	case Action:
-		//controlInit();
+		servoInit();
+		controlInit();
 		break;
 	default:
 		break;

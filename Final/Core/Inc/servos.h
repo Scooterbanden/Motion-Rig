@@ -10,8 +10,8 @@
 
 #include <customMain.h>
 #include "stm32h7xx_hal.h"
-#define STROKE_T 300
-#define STROKE_LR 300
+#define STROKE_T 350
+#define STROKE_LR 350
 #define MM2PULSE 2500
 
 // Forward declaration
@@ -53,6 +53,7 @@ struct servo_t {
 	encoder_t encoder;
 	bool ParkedFlag;
 	pulseCounter_t counter;
+	int16_t prevRpm;
 };
 
 

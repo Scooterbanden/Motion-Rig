@@ -26,6 +26,7 @@ void userInit(void) {
 	oledInit();
 	interfaceInit();
 	setFPS(10);
+	commsInit();
 	timer = HAL_GetTick();
 }
 
@@ -102,11 +103,10 @@ void userLoop(void) {														// Lowest priority code, handles updating ole
 	while (1) {
 		HAL_GPIO_TogglePin(LEDs[ledIdx].port, LEDs[ledIdx].pin);
 		ledIdx = ledIdx + ledDir;
-		if ((ledIdx > 7) | (ledIdx < 0)) {
+		if ((ledIdx > 8) | (ledIdx < 0)) {
 			ledDir = -ledDir;
 			ledIdx = ledIdx + ledDir;
 		}
-		int32_t servoEnc = servo[0].encoder.position;
 		HAL_Delay(200);
 	}
 }

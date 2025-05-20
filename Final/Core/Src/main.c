@@ -64,7 +64,6 @@ TIM_HandleTypeDef htim17;
 
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
-DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
 
@@ -74,7 +73,6 @@ DMA_HandleTypeDef hdma_usart2_tx;
 void SystemClock_Config(void);
 static void MPU_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
 static void MX_HRTIM_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_I2C4_Init(void);
@@ -134,7 +132,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_HRTIM_Init();
   MX_I2C1_Init();
   MX_I2C4_Init();
@@ -1174,22 +1171,6 @@ static void MX_USART3_UART_Init(void)
 }
 
 /**
-  * Enable DMA controller clock
-  */
-static void MX_DMA_Init(void)
-{
-
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA1_CLK_ENABLE();
-
-  /* DMA interrupt init */
-  /* DMA1_Stream0_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
-
-}
-
-/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -1320,25 +1301,25 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(S2_EncZ_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(S1_EncZ_EXTI_IRQn, 1, 0);
+  HAL_NVIC_SetPriority(S1_EncZ_EXTI_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(S1_EncZ_EXTI_IRQn);
 
-  HAL_NVIC_SetPriority(BTN_A_EXTI_IRQn, 1, 0);
+  HAL_NVIC_SetPriority(BTN_A_EXTI_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(BTN_A_EXTI_IRQn);
 
-  HAL_NVIC_SetPriority(BTN_B_EXTI_IRQn, 1, 0);
+  HAL_NVIC_SetPriority(BTN_B_EXTI_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(BTN_B_EXTI_IRQn);
 
-  HAL_NVIC_SetPriority(S1_Treach_EXTI_IRQn, 1, 0);
+  HAL_NVIC_SetPriority(S1_Treach_EXTI_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(S1_Treach_EXTI_IRQn);
 
-  HAL_NVIC_SetPriority(S1_Ready_EXTI_IRQn, 1, 0);
+  HAL_NVIC_SetPriority(S1_Ready_EXTI_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(S1_Ready_EXTI_IRQn);
 
-  HAL_NVIC_SetPriority(UI_Sw_EXTI_IRQn, 1, 0);
+  HAL_NVIC_SetPriority(UI_Sw_EXTI_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(UI_Sw_EXTI_IRQn);
 
-  HAL_NVIC_SetPriority(S3_Treach_EXTI_IRQn, 1, 0);
+  HAL_NVIC_SetPriority(S3_Treach_EXTI_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(S3_Treach_EXTI_IRQn);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */

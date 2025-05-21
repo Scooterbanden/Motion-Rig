@@ -25,8 +25,8 @@ uint8_t fontHeight;
 void userInit(void) {
 	oledInit();
 	interfaceInit();
-	setFPS(10);
 	commsInit();
+	setFPS(5);
 	timer = HAL_GetTick();
 }
 

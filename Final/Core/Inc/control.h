@@ -13,8 +13,8 @@
 #define RPM2FREQ ((float)25/3)
 #define TCONTROL ((float)1/1000)
 #define CALIBRATIONSPEED 100
-#define UPPERLIMIT ((int32_t)STROKE_T*0.9*MM2PULSE)
-#define LOWERLIMIT ((int32_t)STROKE_T*0.1*MM2PULSE)
+#define UPPERLIMIT ((int32_t)STROKE_T*0.4*MM2PULSE)
+#define LOWERLIMIT -((int32_t)STROKE_T*0.4*MM2PULSE)
 
 typedef enum {
 	IDLE = 0U,

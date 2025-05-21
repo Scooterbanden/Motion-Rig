@@ -16,6 +16,8 @@
 int32_t stepTestTime = 5000;
 int32_t seqTestTime = 200000;
 
+int32_t parkPos = 437500;
+
 int valDir = 1;
 int valSpeed = 200;
 double speedChanges = 0;	// For speedShaping parameter calculation mu and sigma
@@ -109,7 +111,8 @@ void controlLoop(void) {
 			posRefs[2] = 0;
 		}
 		loopIteration++;
-		//sendPosData(loopIteration);
+
+		sendPosData(loopIteration);
 
 
 
@@ -211,7 +214,7 @@ void controlLoop(void) {
 		int parking = 0;
 		for (int i = 0; i < 4; i++) {
 			if (servo[i].enableFlag) {
-				if (get_servo_position(&servo[i]) >= (int32_t)STROKE_T/2*MM2PULSE) {
+				if (servo[i].encoder.position >= (int32_t)STROKE_T/2*MM2PULSE) { //(int32_t)STROKE_T/2*MM2PULSE
 					servo[i].ParkedFlag = true;
 					setMotorSpeed(0,&servo[i]);
 				}

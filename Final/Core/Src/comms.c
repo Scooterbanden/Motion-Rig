@@ -11,6 +11,7 @@
 #include <customMain.h>
 #include "comms.h"
 
+uint32_t messageCount = 0;
 // UART communication buffers
 uint8_t RxUART[64];
 float received_floats[4];
@@ -68,7 +69,7 @@ void sendValData(uint32_t loopIteration) {
 			bufIdx += 8;
 		}
 	}
-	HAL_UART_Transmit(&huart2, buffer, bufIdx, HAL_MAX_DELAY);
+	HAL_UART_Transmit(&huart3, buffer, bufIdx, HAL_MAX_DELAY);
 }
 
 void sendPosData(uint32_t loopIteration) {
@@ -90,38 +91,17 @@ void sendPosData(uint32_t loopIteration) {
 			bufIdx += 4;
 		}
 	}
-	HAL_UART_Transmit(&huart2, buffer, bufIdx, HAL_MAX_DELAY);
-}
-
-/*
-void add2Buffer(uint8_t bufIdx, int32_t count, int32_t encoder) {
-	for (int i = 0; i < 4; i++) {
-		writeBuf[writeIdx + i] = (uint8_t)((count >> (i*8)) & 0xFF);
-		writeBuf[writeIdx + 4 + i] = (uint8_t)((encoder >> (i*8)) & 0xFF);
+	if (!uart_busy) {
+		uart_busy = true;
+		HAL_UART_Transmit_IT(&huart3, buffer, bufIdx);
 	}
+
 }
 
-
-void sendUART(void) {
-    if (!uart_busy && writeIdx > 0) {
-        uart_busy = true;
-
-         Swap buffers
-        uint8_t* temp = sendBuf;
-        sendBuf = writeBuf;
-        writeBuf = temp;
-
-        int len = writeIdx;
-        writeIdx = 0;
-
-        HAL_UART_Transmit_DMA(&huart2, sendBuf, len);
-    }
-}
-*/
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if (huart == &huart2) {
+    if (huart == &huart3) {
         uart_busy = false;
     }
 }
@@ -138,18 +118,19 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			received_floats[i] = received_floats[i]*scale[i];
 		}
 		uint32_t newTime = HAL_GetTick();
-		dt = (float)(newTime-commsTimer);
+		dt = (float)(newTime-commsTimer) /1000;
 		commsTimer = newTime;
-		/*
-		if (dt > 100) {
+
+		if (dt > 0.1) {
 			for (int i = 0; i < 3; i++) {
 				prevValues[i].filt_u = 0;
 				prevValues[i].filt_y = 0;
 				prevValues[i].intV_y = 0;
 				prevValues[i].intX_y = 0;
 			}
+			HAL_UART_Receive_IT(&huart2, RxUART, 16);
 			return;
-		}*/
+		}
 		bias[0] = speed2bias(received_floats[3]);
 		hpf(received_floats);
 		fEuler(received_floats);
@@ -158,6 +139,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		limit(received_floats);
 		setRefs(received_floats);
 		commsFlag = true;
+		messageCount++;
 		executionTime = HAL_GetTick() - commsTimer;
 		HAL_UART_Receive_IT(&huart2, RxUART, 16);
 

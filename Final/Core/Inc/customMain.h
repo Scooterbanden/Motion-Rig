@@ -17,7 +17,7 @@
 #include "main.h"
 #include "EEPROM.h"
 
-#define ENCRPMGAIN 10
+#define ENCRPMGAIN 50
 
 
 typedef struct {
@@ -25,6 +25,7 @@ typedef struct {
 	uint16_t pin;
 } GPIO_t;
 
+#include "input_data.h"
 #include "menus.h"
 #include <interface.h>
 #include "comms.h"

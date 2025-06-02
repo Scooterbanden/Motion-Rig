@@ -95,12 +95,29 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {		// Main screen ge
             break;
     }
 }
-
+int indexL = 0;
 void userLoop(void) {														// Lowest priority code, handles updating oled display (user inputs are interrupt based)
+
+
 
 	int ledIdx = 0;
 	int ledDir = 1;
 	while (1) {
+		if (controlMode == GAME) {
+			uint32_t startms = HAL_GetTick();
+		    while (indexL < N) {
+		        uint32_t current_ms = HAL_GetTick() - startms; // ms since startup
+		        if (current_ms >= timeStamp[indexL]) {
+
+		        	float localCopy[4];
+		        	for (int i = 0; i < 4; i++) localCopy[i] = datapoints[indexL][i];
+		            process_sample(localCopy);
+		            indexL++;
+		        }
+		        HAL_Delay(1);
+		        // Optional: low power or small delay
+		    }
+		}
 		HAL_GPIO_TogglePin(LEDs[ledIdx].port, LEDs[ledIdx].pin);
 		ledIdx = ledIdx + ledDir;
 		if ((ledIdx > 8) | (ledIdx < 0)) {
@@ -109,12 +126,13 @@ void userLoop(void) {														// Lowest priority code, handles updating ole
 		}
 		HAL_Delay(200);
 	}
+
 }
 
 void displayLoop(void) {
 	SSD1306_COLOR optionColor[5] = {White};
 	ssd1306_Fill(Black);
-	int32_t newEncoderValue = HAL_LPTIM_ReadCounter(&hlptim2);;
+	int32_t newEncoderValue = __HAL_TIM_GET_COUNTER(&htim5);;
 	int32_t difference = newEncoderValue - encoderValue;
 	encoderValue = newEncoderValue;
 	switch (menuState.current_menu->type) {

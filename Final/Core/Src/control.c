@@ -94,7 +94,10 @@ void controlLoop(void) {
 				else if (temp < INT16_MIN) temp = INT16_MIN;
 
 				int16_t rpm = (int16_t)temp;
+
 				if (i == 0) {
+					loopIteration++;
+					sendRpmSP(loopIteration,rpm);
 					setMotorSpeed(rpm, &servo[i]);
 				}
 				refIdx++;
@@ -110,9 +113,9 @@ void controlLoop(void) {
 			posRefs[1] = 0;
 			posRefs[2] = 0;
 		}
-		loopIteration++;
+		//loopIteration++;
 
-		sendPosData(loopIteration);
+		//sendPosData(loopIteration);
 
 
 
@@ -470,7 +473,7 @@ void setMotorSpeed(int16_t rpm, servo_t* servo) {
 			servo->counter.timer->Instance->CR1 &=  ~TIM_CR1_DIR;
 		}
 	}
-	if (rpm > 3000) { rpm = 3000; }
+	if (rpm > 7000) { rpm = 7000; }
 	if (rpm < 30) {
 		/*
 		if (controlMode == VALIDATION) {

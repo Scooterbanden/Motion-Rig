@@ -40,7 +40,7 @@ void commsInit(void) {
 	for (int i = 0; i < 3; i++) {
 		tau[i] = 1/(2*M_PI*cutoff[i]);
 	}
-	HAL_UART_Receive_IT(&huart2, RxUART, 16);
+	//HAL_UART_Receive_IT(&huart2, RxUART, 16);
 }
 
 void sendValData(uint32_t loopIteration) {
@@ -93,15 +93,35 @@ void sendPosData(uint32_t loopIteration) {
 	}
 	if (!uart_busy) {
 		uart_busy = true;
-		HAL_UART_Transmit_IT(&huart3, buffer, bufIdx);
+		HAL_UART_Transmit_IT(&huart2, buffer, bufIdx);
 	}
+}
 
+void sendRpmSP(uint32_t loopIteration, int16_t rpm) {
+	uint8_t buffer[32];
+
+    buffer[0] = (uint8_t)(loopIteration & 0xFF);
+    buffer[1] = (uint8_t)((loopIteration >> 8) & 0xFF);
+    buffer[2] = (uint8_t)((loopIteration >> 16) & 0xFF);
+    buffer[3] = (uint8_t)((loopIteration >> 24) & 0xFF);
+
+    uint8_t bufIdx = 8;
+
+    int32_t rppm = (int32_t)rpm;
+    buffer[4] = (uint8_t)(rppm & 0xFF);
+    buffer[5] = (uint8_t)((rppm >> 8) & 0xFF);
+    buffer[6] = (uint8_t)((rppm >> 16) & 0xFF);
+    buffer[7] = (uint8_t)((rppm >> 24) & 0xFF);
+	if (!uart_busy) {
+		//uart_busy = true;
+		HAL_UART_Transmit(&huart2, buffer, 8, HAL_MAX_DELAY);
+	}
 }
 
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if (huart == &huart3) {
+    if (huart == &huart2) {
         uart_busy = false;
     }
 }
@@ -144,6 +164,34 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		HAL_UART_Receive_IT(&huart2, RxUART, 16);
 
 	}
+}
+
+void process_sample(float recfloats[4]) {
+	uint32_t newTime = HAL_GetTick();
+	dt = (float)(newTime-commsTimer) /1000;
+	commsTimer = newTime;
+
+	for (int i = 0; i < 3; i++) {
+		recfloats[i] = recfloats[i]*scale[i];
+	}
+	if (dt > 0.1) {
+		for (int i = 0; i < 3; i++) {
+			prevValues[i].filt_u = 0;
+			prevValues[i].filt_y = 0;
+			prevValues[i].intV_y = 0;
+			prevValues[i].intX_y = 0;
+		}
+		return;
+	}
+	bias[0] = speed2bias(recfloats[3]);
+	hpf(recfloats);
+	fEuler(recfloats);
+	leakyInt(recfloats);
+	invKin(recfloats);
+	limit(recfloats);
+	setRefs(recfloats);
+	commsFlag = true;
+	messageCount++;
 }
 
 void hpf(float floats[4]) {

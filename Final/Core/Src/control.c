@@ -36,12 +36,17 @@ ValidationMode validationMode;
 ControlMode requestedMode;		// To allow CALIBRATE to return to the mode that started it
 uint16_t stepRef = 0;
 
-void controlInit(void) {
+void startControl(void) {
 	HAL_TIM_Base_Start_IT(&htim17);
+}
+void stopControl(void) {
+	HAL_TIM_Base_Stop_IT(&htim17);
 }
 
 // 1kHz control loop
 void controlLoop(void) {
+
+	// This loop also also handles encoder tracking (some are 16bit, so they are counted in a 32bit var), same
 	int32_t servoEnc;
 	int32_t servoCount;
 	for (int i = 0; i < 4; i++) {
@@ -59,9 +64,9 @@ void controlLoop(void) {
 			servo[i].encoder.position += delta;  // Update position with delta
 			servo[i].encoder.last_count = curr;  // Store current count for next iteration
 
-			if (servo[i].counter.timer != NULL) {
-				curr = (int32_t)__HAL_TIM_GET_COUNTER(servo[i].counter.timer);
-				delta = (curr - servo[i].counter.last_count);
+			if (servo[i].pulseCounter.timer != NULL) {
+				curr = (int32_t)__HAL_TIM_GET_COUNTER(servo[i].pulseCounter.timer);
+				delta = (curr - servo[i].pulseCounter.last_count);
 
 				// Handle wraparound (up/down counting)
 				if (delta > 32767) {  // Overflow detected (the counter reset to 0)
@@ -70,11 +75,33 @@ void controlLoop(void) {
 					delta += 65536;  // Correct the underflow
 				}
 
-				servo[i].counter.count += delta;  // Update position with delta
-				servo[i].counter.last_count = curr;  // Store current count for next iteration
+				servo[i].pulseCounter.count += delta;  // Update position with delta
+				servo[i].pulseCounter.last_count = curr;  // Store current count for next iteration
 			}
 		}
 	}
+
+	// Control, each mode is semi hardcoded, SEQUENCE, SPEED and STEP validation modes use only first servo, rest uses all available servos
+	/* IDLE: Passive, waiting for mode selection
+	 * GAME: Actual motion, with references calculated from received game data
+	 *
+	 * 		Test modes
+	 * SEQUENCE: First validation sequence, only one implemented is the chirp signal for error-torque dynamic identification
+	 * SPEED: Motor speed is set by user input encoder (Currently
+	 * STEP: Motor speed is set to selected value for a specified time
+	 * REALIGN: Just added due to varying torque in test setup, realigns motor to initial angle
+	 * CONSTSPEED: Constant fixed speed, also just added for testing
+	 *
+	 * 		Utility modes
+	 * CALIBRATE: Moves at fixed low speed until endstop (detected with Treach pin) then resets position and goes to PARK
+	 * PARK: Moves to middle of stroke then resets position.
+	 *
+	 * 		Validation modes (Submodes of VALIDATION)
+	 * INDIVIDUAL_CONSTANT: Moves each servo individually at constant speed steps back and forth till rated speed
+	 * INDIVIDUAL_VARYING: Same idea but with a Wendell distribution looking shape, quick peak and slow decline in speed
+	 * ALL_CONSTANT: All at once constant speed
+	 * ALL_VARYING: All at once, the shaped speeds
+	 */
 	switch (controlMode) {
 	case IDLE:
 		break;
@@ -124,8 +151,8 @@ void controlLoop(void) {
 		float freq = (float)(controlCounter) *freqScale + freqInitial;
 		float rpm = rpmAmplitude*sin(2*3.14*((freq-freqInitial)*freq));
 		setMotorSpeed((int16_t)(rpm), &servo[0]);
-		servoEnc = get_servo_position(&servo[0]);
-		servoCount = get_servo_position(&servo[2]);
+	    servoCount = servo[0].pulseCounter.count;
+		servoEnc = servo[0].encoder.position;
 		send_int32_uart(servoCount*20,servoEnc);
 		controlCounter++;
 		if (controlCounter >= seqTestTime) {
@@ -140,8 +167,8 @@ void controlLoop(void) {
 		break;
 	case STEP:
 		setMotorSpeed(stepRef,&servo[0]);
-		servoEnc = get_servo_position(&servo[0]);
-		servoCount = get_servo_position(&servo[2]);
+	    servoCount = servo[0].pulseCounter.count;
+		servoEnc = servo[0].encoder.position;
 		send_int32_uart(servoCount,servoEnc);
 		controlCounter++;
 		if (controlCounter >= stepTestTime) {
@@ -197,11 +224,11 @@ void controlLoop(void) {
 						__HAL_TIM_SET_COUNTER(servo[i].encoder.encoder,0);
 						servo[i].encoder.position = 0;
 						servo[i].encoder.last_count = 0;
-						if (servo[i].counter.timer != NULL) {
-							__HAL_TIM_SET_COUNTER(servo[i].counter.timer,0);
+						if (servo[i].pulseCounter.timer != NULL) {
+							__HAL_TIM_SET_COUNTER(servo[i].pulseCounter.timer,0);
 						}
-						servo[i].counter.count = 0;
-						servo[i].counter.last_count = 0;
+						servo[i].pulseCounter.count = 0;
+						servo[i].pulseCounter.last_count = 0;
 						servo[i].TreachFlag = false;
 					}
 				}
@@ -235,11 +262,11 @@ void controlLoop(void) {
 					__HAL_TIM_SET_COUNTER(servo[i].encoder.encoder,0);
 					servo[i].encoder.position = 0;
 					servo[i].encoder.last_count = 0;
-					if (servo[i].counter.timer != NULL) {
-						__HAL_TIM_SET_COUNTER(servo[i].counter.timer,0);
+					if (servo[i].pulseCounter.timer != NULL) {
+						__HAL_TIM_SET_COUNTER(servo[i].pulseCounter.timer,0);
 					}
-					servo[i].counter.count = 0;
-					servo[i].counter.last_count = 0;
+					servo[i].pulseCounter.count = 0;
+					servo[i].pulseCounter.last_count = 0;
 				}
 			}
 			for (int i = 0; i < 4; i++) {
@@ -465,12 +492,12 @@ void setMotorSpeed(int16_t rpm, servo_t* servo) {
 	if (rpm < 0) {
 		direction = GPIO_PIN_SET;
 		rpm = abs(rpm);
-		if (servo->counter.timer != NULL) {
-			servo->counter.timer->Instance->CR1 |=  TIM_CR1_DIR;
+		if (servo->pulseCounter.timer != NULL) {
+			servo->pulseCounter.timer->Instance->CR1 |=  TIM_CR1_DIR;
 		}
 	} else {
-		if (servo->counter.timer != NULL) {
-			servo->counter.timer->Instance->CR1 &=  ~TIM_CR1_DIR;
+		if (servo->pulseCounter.timer != NULL) {
+			servo->pulseCounter.timer->Instance->CR1 &=  ~TIM_CR1_DIR;
 		}
 	}
 	if (rpm > 7000) { rpm = 7000; }

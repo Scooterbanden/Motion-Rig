@@ -46,20 +46,17 @@ struct servo_t {
 	bool enableFlag;
 	GPIO_t enablePin;
 	GPIO_t directionPin;
+
 	uint8_t TIM_sourceFlag;
 	TIM_HandleTypeDef* pulseTimerGP;
 	uint32_t TIM_CH_GP;
 	uint32_t TIM_CH_HR;
 	encoder_t encoder;
 	bool ParkedFlag;
-	pulseCounter_t counter;
+	pulseCounter_t pulseCounter;
 	int16_t prevRpm;
 };
 
-
-
-
-// Make `MyStruct` a typedef after the struct is fully defined
 typedef struct servo_t servo_t;
 
 // External reference to the struct array

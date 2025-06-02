@@ -23,6 +23,10 @@ float cutoff[3] = {0.001,0.001,0.001};
 float scale[3] = {-0.05,-0.01,-0.01};
 float lambda[3] = {30, 1, 1};
 float bias[3] = {0};
+
+float wn[3] = {1.29, 2, 2};
+float k1[3];
+float k2[3];
 prev_vals prevValues[3] = {0};
 int32_t posRefs[3] = {0};
 bool commsFlag = false;
@@ -38,6 +42,9 @@ uint32_t commsTimer;
 void commsInit(void) {
 	commsTimer = HAL_GetTick();
 	for (int i = 0; i < 3; i++) {
+		float zeta = 0.7;
+		k1[i] = 2*zeta*wn[i];
+		k2[i] = wn[i]*wn[i];
 		tau[i] = 1/(2*M_PI*cutoff[i]);
 	}
 	//HAL_UART_Receive_IT(&huart2, RxUART, 16);
@@ -57,9 +64,9 @@ void sendValData(uint32_t loopIteration) {
 	for (int i = 0; i < 4; i++) {
 		if (servo[i].enableFlag) {
 			if (i == 2) {
-				servoCount = servo[i].counter.count*10;
+				servoCount = servo[i].pulseCounter.count*10;
 			} else {
-				servoCount = servo[i].counter.count*20;
+				servoCount = servo[i].pulseCounter.count*20;
 			}
 			servoEnc = servo[i].encoder.position;
 			for (int j = 0; j < 4; j++) {
@@ -144,23 +151,30 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		if (dt > 0.1) {
 			for (int i = 0; i < 3; i++) {
 				prevValues[i].filt_u = 0;
+				prevValues[i].filt_u2 = 0;
 				prevValues[i].filt_y = 0;
+				prevValues[i].filt_y2 = 0;
 				prevValues[i].intV_y = 0;
 				prevValues[i].intX_y = 0;
 			}
 			HAL_UART_Receive_IT(&huart2, RxUART, 16);
 			return;
 		}
-		bias[0] = speed2bias(received_floats[3]);
-		hpf(received_floats);
-		fEuler(received_floats);
-		leakyInt(received_floats);
+		/*		First MCA
+		bias[0] = speed2bias(recfloats[3]);
+		hpf(recfloats);
+		fEuler(recfloats);
+		leakyInt(recfloats);
+		*/
+
+		hpf2(recfloats);
+
 		invKin(received_floats);
 		limit(received_floats);
 		setRefs(received_floats);
 		commsFlag = true;
 		messageCount++;
-		executionTime = HAL_GetTick() - commsTimer;
+		//executionTime = HAL_GetTick() - commsTimer;
 		HAL_UART_Receive_IT(&huart2, RxUART, 16);
 
 	}
@@ -177,21 +191,51 @@ void process_sample(float recfloats[4]) {
 	if (dt > 0.1) {
 		for (int i = 0; i < 3; i++) {
 			prevValues[i].filt_u = 0;
+			prevValues[i].filt_u2 = 0;
 			prevValues[i].filt_y = 0;
+			prevValues[i].filt_y2 = 0;
 			prevValues[i].intV_y = 0;
 			prevValues[i].intX_y = 0;
 		}
 		return;
 	}
+	/*		First MCA
 	bias[0] = speed2bias(recfloats[3]);
 	hpf(recfloats);
 	fEuler(recfloats);
 	leakyInt(recfloats);
+	*/
+
+	hpf2(recfloats);
+
 	invKin(recfloats);
 	limit(recfloats);
 	setRefs(recfloats);
 	commsFlag = true;
 	messageCount++;
+}
+
+void hpf2(float floats[4]) {
+	for (int i = 0; i < 3; i++) {
+		float u = floats[i];
+
+		float dts = dt*dt;
+		float b0 = 4/dts;
+		float b1 = -8/dts;
+		float b2 = 4/dts;
+
+		float a0 = b0 + k1[i]*2/dt + k2[i];
+		float a1 = -2 * b0 + 2* k2[i];
+		float a2 = b0 - k1[i]*2/dt + k2[i];
+
+		floats[i] = (b0*u + b1*prevValues[i].filt_u + b2*prevValues[i].filt_u2 - a1*prevValues[i].filt_y - a2*prevValues[i].filt_y2) / a0;
+
+		prevValues[i].filt_y2 = prevValues[i].filt_y;
+		prevValues[i].filt_y = floats[i];
+		prevValues[i].filt_u2 = prevValues[i].filt_u;
+		prevValues[i].filt_u = u;
+
+	}
 }
 
 void hpf(float floats[4]) {

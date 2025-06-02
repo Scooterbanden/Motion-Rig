@@ -25,9 +25,12 @@
 
 typedef struct{
 	float filt_u;
+	float filt_u2;
 	float filt_y;
+	float filt_y2;
 	float intV_y;
 	float intX_y;
+
 }prev_vals;
 
 extern int32_t posRefs[3];

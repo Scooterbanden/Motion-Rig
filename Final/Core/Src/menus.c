@@ -158,12 +158,12 @@ void enterMenu(void) {
 	switch (menuState.current_menu->type) {
 	case Idle:
 		servoInit();
-		controlInit();
+		startControl();
 		break;
 	case Motion:
 	case Action:
 		servoInit();
-		controlInit();
+		startControl();
 		break;
 	default:
 		break;

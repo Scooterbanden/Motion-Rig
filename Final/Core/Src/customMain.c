@@ -79,9 +79,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {		// Main screen ge
         */
         case (uintptr_t)TIM14:
 			if (getGPIO(servo[2].directionPin) == GPIO_PIN_SET) {
-				servo[2].counter.count--;
+				servo[2].pulseCounter.count--;
 			} else {
-				servo[2].counter.count++;
+				servo[2].pulseCounter.count++;
 			}
         	break;
         case (uintptr_t)TIM17:
@@ -103,6 +103,7 @@ void userLoop(void) {														// Lowest priority code, handles updating ole
 	int ledIdx = 0;
 	int ledDir = 1;
 	while (1) {
+		/*
 		if (controlMode == GAME) {
 			uint32_t startms = HAL_GetTick();
 		    while (indexL < N) {
@@ -118,6 +119,7 @@ void userLoop(void) {														// Lowest priority code, handles updating ole
 		        // Optional: low power or small delay
 		    }
 		}
+		*/
 		HAL_GPIO_TogglePin(LEDs[ledIdx].port, LEDs[ledIdx].pin);
 		ledIdx = ledIdx + ledDir;
 		if ((ledIdx > 8) | (ledIdx < 0)) {

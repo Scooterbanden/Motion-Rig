@@ -46,7 +46,7 @@ extern uint32_t controlCounter;
 extern ValidationMode validationMode;
 extern ControlMode controlMode;
 
-void controlInit(void);
+void startControl(void);
 void controlLoop(void);
 float shapedSpeed(uint32_t k, double mu, double sigma, double maxSpeed);
 bool nextSpeed(void);

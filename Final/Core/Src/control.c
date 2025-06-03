@@ -36,8 +36,19 @@ ValidationMode validationMode;
 ControlMode requestedMode;		// To allow CALIBRATE to return to the mode that started it
 uint16_t stepRef = 0;
 
+int32_t parkPosition[3];
+
 void startControl(void) {
 	HAL_TIM_Base_Start_IT(&htim17);
+
+	// set park position to initial positions
+	float floats_init[4] = {0};
+	parkPosition[0] = speed2bias(0);
+	invKin(floats_init);
+	setRefs(floats_init);
+	parkPosition[1] = posRefs[1];
+	parkPosition[2] = posRefs[2];
+
 }
 void stopControl(void) {
 	HAL_TIM_Base_Stop_IT(&htim17);
@@ -111,22 +122,29 @@ void controlLoop(void) {
 			controlMode = CALIBRATE;
 			break;
 		}
+
+		/* Control Loop
+		 * Assumes at most 3 servos are active (and enabled at this point)
+		 * They should correspond to the position references array
+		 * Surge, Front, Back  (or T, L, R as denoted in the project)
+		 */
 		uint8_t refIdx = 0;
 		for (int i = 0; i < 4; i++) {
 			if (servo[i].enableFlag) {
+
+				// Error and gain
 				int32_t error = posRefs[refIdx] - servo[i].encoder.position;
 				float temp = (float)error * 0.08f;
 
+				// Avoid range silliness before converting float to int16
 				if (temp > INT16_MAX) temp = INT16_MAX;
 				else if (temp < INT16_MIN) temp = INT16_MIN;
 
 				int16_t rpm = (int16_t)temp;
-
 				loopIteration++;
 				//sendRpmSP(loopIteration,rpm);
-				if (true) {
+				if (true) { // Can be set to different logic, to only use some actuators, eg. i==0 for only surge
 					setMotorSpeed(rpm, &servo[i]);
-
 				}
 				refIdx++;
 
@@ -138,9 +156,7 @@ void controlLoop(void) {
 			commsFlag = false;
 		}
 		if (controlCounter > 100) {
-			posRefs[0] = 0;
-			posRefs[1] = 0;
-			posRefs[2] = 0;
+			// could do something if no messages have been received for 100ms (they should arrive each 1/60 = 16ms)
 		}
 		//loopIteration++;
 
@@ -224,13 +240,13 @@ void controlLoop(void) {
 				for (int i = 0; i < 4; i++) {
 					if (servo[i].enableFlag) {
 						__HAL_TIM_SET_COUNTER(servo[i].encoder.encoder,0);
-						servo[i].encoder.position = 0;
+						servo[i].encoder.position = - ((int32_t)STROKE_T/2*MM2PULSE);
 						servo[i].encoder.last_count = 0;
 						if (servo[i].pulseCounter.timer != NULL) {
 							__HAL_TIM_SET_COUNTER(servo[i].pulseCounter.timer,0);
 						}
-						servo[i].pulseCounter.count = 0;
-						servo[i].pulseCounter.last_count = 0;
+						//servo[i].pulseCounter.count = 0;
+						//servo[i].pulseCounter.last_count = 0;
 						servo[i].TreachFlag = false;
 					}
 				}
@@ -246,7 +262,7 @@ void controlLoop(void) {
 		int parking = 0;
 		for (int i = 0; i < 4; i++) {
 			if (servo[i].enableFlag) {
-				if (servo[i].encoder.position >= (int32_t)STROKE_T/2*MM2PULSE) { //(int32_t)STROKE_T/2*MM2PULSE
+				if (servo[i].encoder.position >= parkPosition[i]) {
 					servo[i].ParkedFlag = true;
 					setMotorSpeed(0,&servo[i]);
 				}

@@ -55,80 +55,7 @@ void commsInit(void) {
 	HAL_UART_Receive_IT(&huart2, tempData, 1);
 }
 
-void sendValData(uint32_t loopIteration) {
-	uint8_t buffer[32];
-	uint32_t servoCount;
-	uint32_t servoEnc;
 
-    buffer[0] = (uint8_t)(loopIteration & 0xFF);
-    buffer[1] = (uint8_t)((loopIteration >> 8) & 0xFF);
-    buffer[2] = (uint8_t)((loopIteration >> 16) & 0xFF);
-    buffer[3] = (uint8_t)((loopIteration >> 24) & 0xFF);
-
-    uint8_t bufIdx = 4;
-	for (int i = 0; i < 4; i++) {
-		if (servo[i].enableFlag) {
-			if (i == 2) {
-				servoCount = servo[i].pulseCounter.count*10;
-			} else {
-				servoCount = servo[i].pulseCounter.count*20;
-			}
-			servoEnc = servo[i].encoder.position;
-			for (int j = 0; j < 4; j++) {
-				buffer[bufIdx + j] = (uint8_t)((servoCount >> (j*8)) & 0xFF);
-				buffer[bufIdx + 4 + j] = (uint8_t)((servoEnc >> (j*8)) & 0xFF);
-			}
-			bufIdx += 8;
-		}
-	}
-	HAL_UART_Transmit(&huart3, buffer, bufIdx, HAL_MAX_DELAY);
-}
-
-void sendPosData(uint32_t loopIteration) {
-	uint8_t buffer[32];
-	uint32_t servoEnc;
-
-    buffer[0] = (uint8_t)(loopIteration & 0xFF);
-    buffer[1] = (uint8_t)((loopIteration >> 8) & 0xFF);
-    buffer[2] = (uint8_t)((loopIteration >> 16) & 0xFF);
-    buffer[3] = (uint8_t)((loopIteration >> 24) & 0xFF);
-
-    uint8_t bufIdx = 4;
-	for (int i = 0; i < 4; i++) {
-		if (servo[i].enableFlag) {
-			servoEnc = servo[i].encoder.position;
-			for (int j = 0; j < 4; j++) {
-				buffer[bufIdx + j] = (uint8_t)((servoEnc >> (j*8)) & 0xFF);
-			}
-			bufIdx += 4;
-		}
-	}
-	if (!uart_busy) {
-		uart_busy = true;
-		HAL_UART_Transmit_IT(&huart2, buffer, bufIdx);
-	}
-}
-
-void sendRpmSP(uint32_t loopIteration, int16_t rpm) {
-	uint8_t buffer[32];
-
-    buffer[0] = (uint8_t)(loopIteration & 0xFF);
-    buffer[1] = (uint8_t)((loopIteration >> 8) & 0xFF);
-    buffer[2] = (uint8_t)((loopIteration >> 16) & 0xFF);
-    buffer[3] = (uint8_t)((loopIteration >> 24) & 0xFF);
-
-    uint8_t bufIdx = 8;
-
-    int32_t rppm = (int32_t)rpm;
-    buffer[4] = (uint8_t)(rppm & 0xFF);
-    buffer[5] = (uint8_t)((rppm >> 8) & 0xFF);
-    buffer[6] = (uint8_t)((rppm >> 16) & 0xFF);
-    buffer[7] = (uint8_t)((rppm >> 24) & 0xFF);
-	if (!uart_busy) {
-		//uart_busy = true;
-		HAL_UART_Transmit(&huart2, buffer, 8, HAL_MAX_DELAY);
-	}
-}
 
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
@@ -143,7 +70,6 @@ uint32_t executionTime = 0;
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
     if (huart->ErrorCode & HAL_UART_ERROR_ORE) {
         // Overrun error occurred
-    	setGPIO(LEDs[7],GPIO_PIN_SET);
     	setGPIO(LEDs[8],GPIO_PIN_SET);
     }
 
@@ -169,46 +95,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			}
 		}
 		HAL_UART_Receive_IT(&huart2, tempData, 1);
-
-		/*
-		// [accSurge][accSway][accYaw][speed]
-		for (int i = 0; i < 3; i++) {
-			received_floats[i] = received_floats[i]*scale[i];
-		}
-		uint32_t newTime = HAL_GetTick();
-		dt = (float)(newTime-commsTimer) /1000;
-		commsTimer = newTime;
-
-		if (dt > 0.1) {
-			for (int i = 0; i < 3; i++) {
-				prevValues[i].filt_u = 0;
-				prevValues[i].filt_u2 = 0;
-				prevValues[i].filt_y = 0;
-				prevValues[i].filt_y2 = 0;
-				prevValues[i].intV_y = 0;
-				prevValues[i].intX_y = 0;
-			}
-			HAL_UART_Receive_IT(&huart2, RxUART, 16);
-			return;
-		}
-				First MCA
-		bias[0] = speed2bias(recfloats[3]);
-		hpf(recfloats);
-		fEuler(recfloats);
-		leakyInt(recfloats);
-
-
-		hpf2(received_floats);
-
-		invKin(received_floats);
-		limit(received_floats);
-		setRefs(received_floats);
-		commsFlag = true;
-		messageCount++;
-		//executionTime = HAL_GetTick() - commsTimer;
-		HAL_UART_Receive_IT(&huart2, RxUART, 16);
-		*/
-
 }
 
 void parseMessage(void) {
@@ -241,6 +127,11 @@ void process_data(float recfloats[4]) {
 	commsTimer = newTime;
 
 	for (int i = 0; i < 3; i++) {
+		if ((i != 2) && (recfloats[i] > 25)) {
+			recfloats[i] = 25;
+		} else if (recfloats[i] > 100) {
+			recfloats[i] = 100; 	// Higher acc limit for yaw
+		}
 		recfloats[i] = recfloats[i]*scale[i];
 	}
 	if (dt > 0.1) {
@@ -364,5 +255,81 @@ void limit(float floats[4]) {
 void setRefs(float floats[4]) {
 	for (int i = 0; i < 3; i++) {
 		posRefs[i] = (int32_t)(floats[i]*2500000);
+	}
+}
+
+
+void sendValData(uint32_t loopIteration) {
+	uint8_t buffer[32];
+	uint32_t servoCount;
+	uint32_t servoEnc;
+
+    buffer[0] = (uint8_t)(loopIteration & 0xFF);
+    buffer[1] = (uint8_t)((loopIteration >> 8) & 0xFF);
+    buffer[2] = (uint8_t)((loopIteration >> 16) & 0xFF);
+    buffer[3] = (uint8_t)((loopIteration >> 24) & 0xFF);
+
+    uint8_t bufIdx = 4;
+	for (int i = 0; i < 4; i++) {
+		if (servo[i].enableFlag) {
+			if (i == 2) {
+				servoCount = servo[i].pulseCounter.count*10;
+			} else {
+				servoCount = servo[i].pulseCounter.count*20;
+			}
+			servoEnc = servo[i].encoder.position;
+			for (int j = 0; j < 4; j++) {
+				buffer[bufIdx + j] = (uint8_t)((servoCount >> (j*8)) & 0xFF);
+				buffer[bufIdx + 4 + j] = (uint8_t)((servoEnc >> (j*8)) & 0xFF);
+			}
+			bufIdx += 8;
+		}
+	}
+	HAL_UART_Transmit(&huart3, buffer, bufIdx, HAL_MAX_DELAY);
+}
+
+void sendPosData(uint32_t loopIteration) {
+	uint8_t buffer[32];
+	uint32_t servoEnc;
+
+    buffer[0] = (uint8_t)(loopIteration & 0xFF);
+    buffer[1] = (uint8_t)((loopIteration >> 8) & 0xFF);
+    buffer[2] = (uint8_t)((loopIteration >> 16) & 0xFF);
+    buffer[3] = (uint8_t)((loopIteration >> 24) & 0xFF);
+
+    uint8_t bufIdx = 4;
+	for (int i = 0; i < 4; i++) {
+		if (servo[i].enableFlag) {
+			servoEnc = servo[i].encoder.position;
+			for (int j = 0; j < 4; j++) {
+				buffer[bufIdx + j] = (uint8_t)((servoEnc >> (j*8)) & 0xFF);
+			}
+			bufIdx += 4;
+		}
+	}
+	if (!uart_busy) {
+		uart_busy = true;
+		HAL_UART_Transmit_IT(&huart2, buffer, bufIdx);
+	}
+}
+
+void sendRpmSP(uint32_t loopIteration, int16_t rpm) {
+	uint8_t buffer[32];
+
+    buffer[0] = (uint8_t)(loopIteration & 0xFF);
+    buffer[1] = (uint8_t)((loopIteration >> 8) & 0xFF);
+    buffer[2] = (uint8_t)((loopIteration >> 16) & 0xFF);
+    buffer[3] = (uint8_t)((loopIteration >> 24) & 0xFF);
+
+    //uint8_t bufIdx = 8;
+
+    int32_t rppm = (int32_t)rpm;
+    buffer[4] = (uint8_t)(rppm & 0xFF);
+    buffer[5] = (uint8_t)((rppm >> 8) & 0xFF);
+    buffer[6] = (uint8_t)((rppm >> 16) & 0xFF);
+    buffer[7] = (uint8_t)((rppm >> 24) & 0xFF);
+	if (!uart_busy) {
+		//uart_busy = true;
+		HAL_UART_Transmit(&huart2, buffer, 8, HAL_MAX_DELAY);
 	}
 }

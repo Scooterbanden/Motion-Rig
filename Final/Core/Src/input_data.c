@@ -4,6 +4,24 @@ const int N = 6795;
 
 #include <input_data.h>
 
+/*  Used in main loop, for emulating receiving data
+if (controlMode == GAME) {
+	uint32_t startms = HAL_GetTick();
+    while (indexL < N) {
+        uint32_t current_ms = HAL_GetTick() - startms; // ms since startup
+        if (current_ms >= timeStamp[indexL]) {
+
+        	float localCopy[4];
+        	for (int i = 0; i < 4; i++) localCopy[i] = datapoints[indexL][i];
+            process_sample(localCopy);
+            indexL++;
+        }
+        HAL_Delay(1);
+        // Optional: low power or small delay
+    }
+}
+*/
+
 const uint32_t timeStamp[] = {
   0u,
   33u,

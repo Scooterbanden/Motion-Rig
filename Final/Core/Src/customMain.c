@@ -99,32 +99,31 @@ int indexL = 0;
 void userLoop(void) {														// Lowest priority code, handles updating oled display (user inputs are interrupt based)
 
 
-
 	int ledIdx = 0;
 	int ledDir = 1;
 	while (1) {
-		/*
-		if (controlMode == GAME) {
-			uint32_t startms = HAL_GetTick();
-		    while (indexL < N) {
-		        uint32_t current_ms = HAL_GetTick() - startms; // ms since startup
-		        if (current_ms >= timeStamp[indexL]) {
-
-		        	float localCopy[4];
-		        	for (int i = 0; i < 4; i++) localCopy[i] = datapoints[indexL][i];
-		            process_sample(localCopy);
-		            indexL++;
-		        }
-		        HAL_Delay(1);
-		        // Optional: low power or small delay
-		    }
-		}
-		*/
-		HAL_GPIO_TogglePin(LEDs[ledIdx].port, LEDs[ledIdx].pin);
-		ledIdx = ledIdx + ledDir;
-		if ((ledIdx > 4) | (ledIdx < 0)) {
+		if ((controlMode == CALIBRATE) || (controlMode == PARK)) {
+			GPIO_PinState state;
+			ledIdx = 6;
+			if (ledDir == 1) {
+				state = GPIO_PIN_SET;
+				ledIdx = 6;
+			} else {
+				state = GPIO_PIN_RESET;
+				ledIdx = 0;
+			}
+			for (int i = 0; i < 7; i++) {
+				setGPIO(LEDs[i], state);
+			}
 			ledDir = -ledDir;
+
+		} else {
+			HAL_GPIO_TogglePin(LEDs[ledIdx].port, LEDs[ledIdx].pin);
 			ledIdx = ledIdx + ledDir;
+			if ((ledIdx > 6) | (ledIdx < 0)) {
+				ledDir = -ledDir;
+				ledIdx = ledIdx + ledDir;
+			}
 		}
 		HAL_Delay(200);
 	}

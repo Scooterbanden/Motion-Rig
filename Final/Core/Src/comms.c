@@ -13,18 +13,23 @@
 
 uint32_t messageCount = 0;
 // UART communication buffers
-uint8_t RxUART[64];
+#define UART_BUFF_SIZE 128
+uint8_t RxUART[UART_BUFF_SIZE];
 float received_floats[4];
 uint8_t tempData[2];
+int recBufIdx = 0;
+bool msgCorruptedFlag = false;
+
 int bufIdx = 0;
 float dt;
 float tau[3];
 float cutoff[3] = {0.001,0.001,0.001};
-float scale[3] = {-0.05,-0.01,-0.01};
+
 float lambda[3] = {30, 1, 1};
 float bias[3] = {0};
 
-float wn[3] = {1.29, 2, 2};
+float scale[3] = {0.008,0.004,0.0005};
+float wn[3] = {1.1547, 0.8165, 0.8165};
 float k1[3];
 float k2[3];
 prev_vals prevValues[3] = {0};
@@ -47,7 +52,7 @@ void commsInit(void) {
 		k2[i] = wn[i]*wn[i];
 		tau[i] = 1/(2*M_PI*cutoff[i]);
 	}
-	//HAL_UART_Receive_IT(&huart2, RxUART, 16);
+	HAL_UART_Receive_IT(&huart2, tempData, 1);
 }
 
 void sendValData(uint32_t loopIteration) {
@@ -139,8 +144,23 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	// Receive UART data
 	if (huart == &huart2) {
+		memcpy(RxUART+recBufIdx, tempData, 1);
+		if (tempData[0] == '\n') {
+			if (!msgCorruptedFlag) {
+				parseMessage();
+			} else {
+				msgCorruptedFlag = false;
+			}
+			recBufIdx = 0;
+		} else if (++recBufIdx >= UART_BUFF_SIZE) {
+				recBufIdx = 0;
+				msgCorruptedFlag = true;
+			}
+		}
+		HAL_UART_Receive_IT(&huart2, tempData, 1);
+
+		/*
 		// [accSurge][accSway][accYaw][speed]
-		memcpy(received_floats, RxUART, 16);
 		for (int i = 0; i < 3; i++) {
 			received_floats[i] = received_floats[i]*scale[i];
 		}
@@ -160,12 +180,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 			HAL_UART_Receive_IT(&huart2, RxUART, 16);
 			return;
 		}
-		/*		First MCA
+				First MCA
 		bias[0] = speed2bias(recfloats[3]);
 		hpf(recfloats);
 		fEuler(recfloats);
 		leakyInt(recfloats);
-		*/
+
 
 		hpf2(received_floats);
 
@@ -176,11 +196,35 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		messageCount++;
 		//executionTime = HAL_GetTick() - commsTimer;
 		HAL_UART_Receive_IT(&huart2, RxUART, 16);
+		*/
 
-	}
 }
 
-void process_sample(float recfloats[4]) {
+void parseMessage(void) {
+    char temp_buffer[UART_BUFF_SIZE];
+    float values[4];
+    char *token;
+    int i = 0;
+
+    // Find length up to '\n'
+    size_t len = strcspn((char *)RxUART, "\n");
+    if (len == UART_BUFF_SIZE || RxUART[len] != '\n') return; // Invalid message
+
+    memcpy(temp_buffer, RxUART, len);
+    temp_buffer[len] = '\0'; // Null-terminate
+
+    token = strtok(temp_buffer, ",");
+    while (token && i < 4) {
+        values[i++] = strtof(token, NULL);
+        token = strtok(NULL, ",");
+    }
+
+    if (i == 4) {
+        process_data(values);
+    }
+}
+
+void process_data(float recfloats[4]) {
 	uint32_t newTime = HAL_GetTick();
 	dt = (float)(newTime-commsTimer) /1000;
 	commsTimer = newTime;

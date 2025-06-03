@@ -122,7 +122,7 @@ void userLoop(void) {														// Lowest priority code, handles updating ole
 		*/
 		HAL_GPIO_TogglePin(LEDs[ledIdx].port, LEDs[ledIdx].pin);
 		ledIdx = ledIdx + ledDir;
-		if ((ledIdx > 8) | (ledIdx < 0)) {
+		if ((ledIdx > 4) | (ledIdx < 0)) {
 			ledDir = -ledDir;
 			ledIdx = ledIdx + ledDir;
 		}

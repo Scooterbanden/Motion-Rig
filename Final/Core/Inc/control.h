@@ -8,11 +8,11 @@
 #ifndef INC_CONTROL_H_
 #define INC_CONTROL_H_
 
-#define MAX_DELTA 200
+#define MAX_DELTA 40
 #define CLOCKFREQ 20000000
 #define RPM2FREQ ((float)25/3)
 #define TCONTROL ((float)1/1000)
-#define CALIBRATIONSPEED 100
+#define CALIBRATIONSPEED 250
 #define UPPERLIMIT ((int32_t)STROKE_T*0.4*MM2PULSE)
 #define LOWERLIMIT -((int32_t)STROKE_T*0.4*MM2PULSE)
 

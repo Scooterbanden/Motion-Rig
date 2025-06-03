@@ -23,12 +23,12 @@ bool msgCorruptedFlag = false;
 int bufIdx = 0;
 float dt;
 float tau[3];
-float cutoff[3] = {0.001,0.001,0.001};
+float cutoff[3] = {2.25,7.5,2.5};
 
-float lambda[3] = {30, 1, 1};
+float lambda[3] = {1, 0.6, 0.6};
 float bias[3] = {0};
 
-float scale[3] = {0.008,0.004,0.0005};
+float scale[3] = {-0.2,0.2,0.05};
 float wn[3] = {1.1547, 0.8165, 0.8165};
 float k1[3];
 float k2[3];
@@ -140,6 +140,17 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 
 uint32_t executionTime = 0;
 
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
+    if (huart->ErrorCode & HAL_UART_ERROR_ORE) {
+        // Overrun error occurred
+    	setGPIO(LEDs[7],GPIO_PIN_SET);
+    	setGPIO(LEDs[8],GPIO_PIN_SET);
+    }
+
+    // Restart reception if needed
+    HAL_UART_Receive_IT(huart, tempData, 1);
+}
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	// Receive UART data
@@ -244,13 +255,17 @@ void process_data(float recfloats[4]) {
 		return;
 	}
 	/*		First MCA
+	 *
+	 *
+	 *
+	 */
 	bias[0] = speed2bias(recfloats[3]);
 	hpf(recfloats);
 	fEuler(recfloats);
 	leakyInt(recfloats);
-	*/
+	//recfloats[2] = 0;
 
-	hpf2(recfloats);
+	//hpf2(recfloats);
 
 	invKin(recfloats);
 	limit(recfloats);

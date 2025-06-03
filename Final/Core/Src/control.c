@@ -122,12 +122,14 @@ void controlLoop(void) {
 
 				int16_t rpm = (int16_t)temp;
 
-				if (i == 0) {
-					loopIteration++;
-					sendRpmSP(loopIteration,rpm);
+				loopIteration++;
+				//sendRpmSP(loopIteration,rpm);
+				if (true) {
 					setMotorSpeed(rpm, &servo[i]);
+
 				}
 				refIdx++;
+
 			}
 		}
 		controlCounter++;

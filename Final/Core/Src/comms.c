@@ -167,7 +167,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		leakyInt(recfloats);
 		*/
 
-		hpf2(recfloats);
+		hpf2(received_floats);
 
 		invKin(received_floats);
 		limit(received_floats);

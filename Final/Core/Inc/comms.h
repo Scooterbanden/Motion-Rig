@@ -43,6 +43,7 @@ void sendPosData(uint32_t loopIteration);
 void sendRpmSP(uint32_t loopIteration, int16_t rpm);
 void process_sample(float recfloats[4]);
 
+void hpf2(float floats[4]);
 void hpf(float floats[4]);
 void fEuler(float floats[4]);
 float speed2bias(float speed);

@@ -8,7 +8,7 @@
 #ifndef INC_CONTROL_H_
 #define INC_CONTROL_H_
 
-#define MAX_DELTA 40
+#define MAX_DELTA 20
 #define CLOCKFREQ 20000000
 #define RPM2FREQ ((float)25/3)
 #define TCONTROL ((float)1/1000)

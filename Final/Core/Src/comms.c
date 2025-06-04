@@ -23,12 +23,12 @@ bool msgCorruptedFlag = false;
 int bufIdx = 0;
 float dt;
 float tau[3];
-float cutoff[3] = {2.25,7.5,2.5};
+float cutoff[3] = {1.25,2.75,1.5};
 
 float lambda[3] = {1, 0.6, 0.6};
 float bias[3] = {0};
 
-float scale[3] = {-0.2,0.2,0.05};
+float scale[3] = {-0.1,0.06,-0.009};
 float wn[3] = {1.1547, 0.8165, 0.8165};
 float k1[3];
 float k2[3];
@@ -143,6 +143,7 @@ void process_data(float recfloats[4]) {
 			prevValues[i].intV_y = 0;
 			prevValues[i].intX_y = 0;
 		}
+		prevValues[0].intX_y = speed2bias(0);
 		return;
 	}
 	/*		First MCA

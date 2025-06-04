@@ -36,18 +36,15 @@ ValidationMode validationMode;
 ControlMode requestedMode;		// To allow CALIBRATE to return to the mode that started it
 uint16_t stepRef = 0;
 
-int32_t parkPosition[3];
 
 void startControl(void) {
 	HAL_TIM_Base_Start_IT(&htim17);
 
 	// set park position to initial positions
-	float floats_init[4] = {0};
-	parkPosition[0] = speed2bias(0);
+	float floats_init[4] = {0,0,0,0};
+	floats_init[0] = speed2bias(floats_init[3]);
 	invKin(floats_init);
 	setRefs(floats_init);
-	parkPosition[1] = posRefs[1];
-	parkPosition[2] = posRefs[2];
 
 }
 void stopControl(void) {
@@ -227,7 +224,7 @@ void controlLoop(void) {
 			if (servo[i].enableFlag) {
 				if (!(servo[i].TreachFlag)) {
 					running++;
-					setMotorSpeed(-CALIBRATIONSPEED,&servo[i]);
+					setMotorSpeed(CALIBRATIONSPEED,&servo[i]);
 				} else {
 					setMotorSpeed(0,&servo[i]);
 				}
@@ -240,7 +237,7 @@ void controlLoop(void) {
 				for (int i = 0; i < 4; i++) {
 					if (servo[i].enableFlag) {
 						__HAL_TIM_SET_COUNTER(servo[i].encoder.encoder,0);
-						servo[i].encoder.position = - ((int32_t)STROKE_T/2*MM2PULSE);
+						servo[i].encoder.position = ((int32_t)STROKE_T/2*MM2PULSE);
 						servo[i].encoder.last_count = 0;
 						if (servo[i].pulseCounter.timer != NULL) {
 							__HAL_TIM_SET_COUNTER(servo[i].pulseCounter.timer,0);
@@ -262,13 +259,13 @@ void controlLoop(void) {
 		int parking = 0;
 		for (int i = 0; i < 4; i++) {
 			if (servo[i].enableFlag) {
-				if (servo[i].encoder.position >= parkPosition[i]) {
+				if (servo[i].encoder.position <= posRefs[i]) {
 					servo[i].ParkedFlag = true;
 					setMotorSpeed(0,&servo[i]);
 				}
 				if (!(servo[i].ParkedFlag)) {
 					parking++;
-					setMotorSpeed(CALIBRATIONSPEED,&servo[i]);
+					setMotorSpeed(-CALIBRATIONSPEED,&servo[i]);
 				}
 			}
 		}
@@ -277,9 +274,9 @@ void controlLoop(void) {
 			loopIteration = 0;
 			for (int i = 0; i < 4; i++) {
 				if (servo[i].enableFlag) {
-					__HAL_TIM_SET_COUNTER(servo[i].encoder.encoder,0);
-					servo[i].encoder.position = 0;
-					servo[i].encoder.last_count = 0;
+					//__HAL_TIM_SET_COUNTER(servo[i].encoder.encoder,0);
+					//servo[i].encoder.position = 0;
+					//servo[i].encoder.last_count = 0;
 					if (servo[i].pulseCounter.timer != NULL) {
 						__HAL_TIM_SET_COUNTER(servo[i].pulseCounter.timer,0);
 					}

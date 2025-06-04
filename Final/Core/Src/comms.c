@@ -69,7 +69,7 @@ void sendValData(uint32_t loopIteration) {
 			bufIdx += 8;
 		}
 	}
-	HAL_UART_Transmit(&huart3, buffer, bufIdx, HAL_MAX_DELAY);
+	HAL_UART_Transmit(&huart2, buffer, bufIdx, HAL_MAX_DELAY);
 }
 
 void sendPosData(uint32_t loopIteration) {

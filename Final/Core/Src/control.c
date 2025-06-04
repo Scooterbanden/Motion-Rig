@@ -124,9 +124,8 @@ void controlLoop(void) {
 		float freq = (float)(controlCounter) *freqScale + freqInitial;
 		float rpm = rpmAmplitude*sin(2*3.14*((freq-freqInitial)*freq));
 		setMotorSpeed((int16_t)(rpm), &servo[0]);
-		servoEnc = get_servo_position(&servo[0]);
-		servoCount = get_servo_position(&servo[2]);
-		send_int32_uart(servoCount*20,servoEnc);
+		loopIteration++;
+		sendValData(loopIteration);
 		controlCounter++;
 		if (controlCounter >= seqTestTime) {
 			setMotorSpeed(0, &servo[0]);
@@ -364,11 +363,11 @@ void controlLoop(void) {
 				controlCounter = 0;
 				if (!nextSpeed()) {
 					// validation complete
-					controlMode = IDLE;
+					controlMode = SEQUENCE;
 					for (int i = 0; i < 4; i++) {
 						setMotorSpeed(0, &servo[i]);
-						setGPIO(servo[i].enablePin, GPIO_PIN_RESET);
-						servo[i].enableFlag = 0;
+						//setGPIO(servo[i].enablePin, GPIO_PIN_RESET);
+						//servo[i].enableFlag = 0;
 					}
 				} else {
 

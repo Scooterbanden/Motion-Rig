@@ -45,8 +45,8 @@ void commsInit(void) {
 
 void sendValData(uint32_t loopIteration) {
 	uint8_t buffer[32];
-	uint32_t servoCount;
-	uint32_t servoEnc;
+	int32_t servoCount;
+	int32_t servoEnc;
 
     buffer[0] = (uint8_t)(loopIteration & 0xFF);
     buffer[1] = (uint8_t)((loopIteration >> 8) & 0xFF);

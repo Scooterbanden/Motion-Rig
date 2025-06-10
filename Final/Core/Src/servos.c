@@ -63,7 +63,10 @@ void servoInit(void) {
 			activeServos++;
 			setGPIO(servo[i].enablePin, GPIO_PIN_SET);
 			servo[i].enableFlag = true;
-
+			servo[i].encoder.position = 0;
+			servo[i].encoder.last_count = 0;
+			servo[i].counter.count = 0;
+			servo[i].counter.last_count = 0;
 			__HAL_TIM_SET_COUNTER(servo[i].encoder.encoder, 0);
 			HAL_TIM_Encoder_Start(servo[i].encoder.encoder, TIM_CHANNEL_ALL);
 			if (i != 2) {

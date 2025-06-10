@@ -123,19 +123,19 @@ void controlLoop(void) {
 	case SEQUENCE:
 		float freq = (float)(controlCounter) *freqScale + freqInitial;
 		float rpm = rpmAmplitude*sin(2*3.14*((freq-freqInitial)*freq));
-		setMotorSpeed((int16_t)(rpm), &servo[0]);
+		setMotorSpeed((int16_t)(rpm), &servo[1]);
 		loopIteration++;
 		sendValData(loopIteration);
 		controlCounter++;
 		if (controlCounter >= seqTestTime) {
-			setMotorSpeed(0, &servo[0]);
+			setMotorSpeed(0, &servo[1]);
 			controlCounter = 0;
 			controlMode = CONSTSPEED;
 		}
 		break;
 	case SPEED:
 		int32_t encoderValue = __HAL_TIM_GET_COUNTER(&htim5);
-		setMotorSpeed((int16_t)(encoderValue*ENCRPMGAIN), &servo[0]);
+		setMotorSpeed((int16_t)(encoderValue*ENCRPMGAIN), &servo[1]);
 		break;
 	case STEP:
 		setMotorSpeed(stepRef,&servo[0]);
@@ -152,7 +152,7 @@ void controlLoop(void) {
 
 	case REALIGN:
 		if (controlCounter == 1000) {
-			servoEnc = get_servo_position(&servo[0]);
+			servoEnc = get_servo_position(&servo[1]);
 			int32_t offset = 10000 - (servoEnc%10000);
 			__HAL_TIM_SET_COUNTER(&htim4,0);
 			servo[2].encoder.position = 0;
@@ -165,13 +165,13 @@ void controlLoop(void) {
 
 	case CONSTSPEED:
 		if (controlCounter > 1000) {
-			setMotorSpeed(200,&servo[0]);
+			setMotorSpeed(200,&servo[1]);
 		}
 		controlCounter++;
 		if (controlCounter > 6000) {
-			setMotorSpeed(0, &servo[0]);
+			setMotorSpeed(0, &servo[1]);
 			controlCounter = 0;
-			controlMode = REALIGN;
+			controlMode = IDLE;
 		}
 		break;
 
@@ -247,7 +247,7 @@ void controlLoop(void) {
 		}
 		break;
 	case VALIDATION:
-		if (!calibrated) {
+		if (calibrated) {
 			requestedMode = controlMode;
 			controlMode = CALIBRATE;
 			break;
@@ -275,7 +275,7 @@ void controlLoop(void) {
 					}
 					if (currentServo == prevServo) {
 						controlCounter = 0;
-						currentServo = 0;
+						currentServo = 1;
 						speedChanges = 0;
 						validationMode = INDIVIDUAL_VARYING;
 					}

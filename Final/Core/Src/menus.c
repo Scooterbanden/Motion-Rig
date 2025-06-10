@@ -128,7 +128,7 @@ void startGame(void) {
 
 void startValidation(void) {
 	controlCounter = 0;
-	validationMode = ALL_CONSTANT;
+	validationMode = ALL_VARYING; //INDIVIDUAL_CONSTANT
 	controlMode = VALIDATION;
 }
 
@@ -159,6 +159,11 @@ void enterMenu(void) {
 	case Idle:
 		servoInit();
 		controlInit();
+		freqScale = 0.00005;
+		rpmAmplitude = 3000;
+		controlCounter = 0;
+		validationMode = INDIVIDUAL_CONSTANT;
+		controlMode = VALIDATION;
 		break;
 	case Motion:
 	case Action:
@@ -176,6 +181,9 @@ void setStepFlag(void) {
 	int32_t encoderValue = __HAL_TIM_GET_COUNTER(&htim5);
 	stepRef = encoderValue*20;
 	controlMode = STEP;
+	controlCounter = 0;
+	validationMode = ALL_VARYING; //INDIVIDUAL_CONSTANT
+	controlMode = VALIDATION;
 }
 
 void startSeq1(void) {
